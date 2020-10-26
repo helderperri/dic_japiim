@@ -13,6 +13,23 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
+ input[type=text]{
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+   border-radius: 5px;
+   border: 1px solid #2d9fd9;
+   color: #222222;
+   text-align:left;
+   width: 230px;
+   height: 25px;
+   padding-right: 10px;
+  }
+  
+input[type=text]:focus {
+   outline: none;
+   /*border: 1px solid #a0d18c;*/
+   color: #004669;
+}
 
  html{
 
@@ -48,6 +65,10 @@
  }
  
 
+ .field_tag{
+  font-size: .8em;
+ }
+
  .vernacular{
      font-size: 1.3em;
      font-style: oblique;
@@ -61,7 +82,7 @@
   font-style: oblique;
 
 }
-.phonetic{
+.pron{
   font-size: .8em;
   font-style: oblique;
 

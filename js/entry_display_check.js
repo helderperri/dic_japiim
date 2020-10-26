@@ -68,20 +68,20 @@ if($("#phonemic_sl2_display").is(":checked")){
     
 }
 
-if($("#phonetic_sl1_display").is(":checked")){
+if($("#pron_sl1_display").is(":checked")){
 
-    $(".phonetic.sl1").show();
+    $(".pron.sl1").show();
 }else{
-    $(".phonetic.sl1").hide();
+    $(".pron.sl1").hide();
     
 }
 
 
-if($("#phonetic_sl2_display").is(":checked")){
+if($("#pron_sl2_display").is(":checked")){
 
-    $(".phonetic.sl2").show();
+    $(".pron.sl2").show();
 }else{
-    $(".phonetic.sl2").hide();
+    $(".pron.sl2").hide();
     
 }
 if($("#part_of_speech_tl1_display").is(":checked")){
@@ -259,7 +259,7 @@ if($("#tl2_code_display").is(":checked")){
 }
 
 function hide_form_bundle_sl1(){
-    if(!$("#vernacular_sl1_display").is(":checked") && !$("#phonemic_sl1_display").is(":checked") && !$("#phonetic_sl1_display").is(":checked")){
+    if(!$("#vernacular_sl1_display").is(":checked") && !$("#phonemic_sl1_display").is(":checked") && !$("#pron_sl1_display").is(":checked")){
         $(".form_bundle.sl1").hide();
     
     }else{
@@ -269,7 +269,7 @@ function hide_form_bundle_sl1(){
 }
 
 function hide_form_bundle_sl2(){
-    if(!$("#vernacular_sl2_display").is(":checked") && !$("#phonemic_sl2_display").is(":checked") && !$("#phonetic_sl2_display").is(":checked")){
+    if(!$("#vernacular_sl2_display").is(":checked") && !$("#phonemic_sl2_display").is(":checked") && !$("#pron_sl2_display").is(":checked")){
         $(".form_bundle.sl2").hide();
     
     }else{

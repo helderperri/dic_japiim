@@ -6,7 +6,7 @@ $('.dropdown-menu').on("click.bs.dropdown", function (e) {
 
 function check_all_sl1(){
 
-    if($("#vernacular_sl1_display").is(":checked") && $("#phonemic_sl1_display").is(":checked") && $("#phonetic_sl1_display").is(":checked") && $("#example_sl1_display").is(":checked") && $("#sl1_code_display").is(":checked")){
+    if($("#vernacular_sl1_display").is(":checked") && $("#phonemic_sl1_display").is(":checked") && $("#pron_sl1_display").is(":checked") && $("#example_sl1_display").is(":checked") && $("#sl1_code_display").is(":checked")){
         $("#all_sl1_display").prop('checked', true);
     
     }else{
@@ -17,7 +17,7 @@ function check_all_sl1(){
 
 function check_all_sl2(){
 
-    if($("#vernacular_sl2_display").is(":checked") && $("#phonemic_sl2_display").is(":checked") && $("#phonetic_sl2_display").is(":checked") && $("#example_sl2_display").is(":checked") && $("#sl2_code_display").is(":checked")){
+    if($("#vernacular_sl2_display").is(":checked") && $("#phonemic_sl2_display").is(":checked") && $("#pron_sl2_display").is(":checked") && $("#example_sl2_display").is(":checked") && $("#sl2_code_display").is(":checked")){
         $("#all_sl2_display").prop('checked', true);
     
     }else{
@@ -51,7 +51,7 @@ function check_all_tl2(){
 }
 
 function hide_form_bundle_sl1(){
-    if(!$("#vernacular_sl1_display").is(":checked") && !$("#phonemic_sl1_display").is(":checked") && !$("#phonetic_sl1_display").is(":checked")){
+    if(!$("#vernacular_sl1_display").is(":checked") && !$("#phonemic_sl1_display").is(":checked") && !$("#pron_sl1_display").is(":checked")){
         $(".form_bundle.sl1").hide();
     
     }else{
@@ -61,7 +61,7 @@ function hide_form_bundle_sl1(){
 }
 
 function hide_form_bundle_sl2(){
-    if(!$("#vernacular_sl2_display").is(":checked") && !$("#phonemic_sl2_display").is(":checked") && !$("#phonetic_sl2_display").is(":checked")){
+    if(!$("#vernacular_sl2_display").is(":checked") && !$("#phonemic_sl2_display").is(":checked") && !$("#pron_sl2_display").is(":checked")){
         $(".form_bundle.sl2").hide();
     
     }else{
@@ -156,7 +156,7 @@ $("#all_sl1_display").change(function() {
         $(".sl1").show();
         $("#vernacular_sl1_display").prop('checked', true);
         $("#phonemic_sl1_display").prop('checked', true);
-        $("#phonetic_sl1_display").prop('checked', true);
+        $("#pron_sl1_display").prop('checked', true);
         $("#example_sl1_display").prop('checked', true);
         $("#sl1_code_display").prop('checked', true);
 
@@ -165,7 +165,7 @@ $("#all_sl1_display").change(function() {
         $(".sl1").hide();
         $("#vernacular_sl1_display").prop('checked', false);
         $("#phonemic_sl1_display").prop('checked', false);
-        $("#phonetic_sl1_display").prop('checked', false);
+        $("#pron_sl1_display").prop('checked', false);
         $("#example_sl1_display").prop('checked', false);
         $("#sl1_code_display").prop('checked', false);
 
@@ -184,7 +184,7 @@ $("#all_sl2_display").change(function() {
         $(".sl2").show();
         $("#vernacular_sl2_display").prop('checked', true);
         $("#phonemic_sl2_display").prop('checked', true);
-        $("#phonetic_sl2_display").prop('checked', true);
+        $("#pron_sl2_display").prop('checked', true);
         $("#example_sl2_display").prop('checked', true);
         $("#sl2_code_display").prop('checked', true);
 
@@ -193,7 +193,7 @@ $("#all_sl2_display").change(function() {
         $(".sl2").hide();
         $("#vernacular_sl2_display").prop('checked', false);
         $("#phonemic_sl2_display").prop('checked', false);
-        $("#phonetic_sl2_display").prop('checked', false);
+        $("#pron_sl2_display").prop('checked', false);
         $("#example_sl2_display").prop('checked', false);
         $("#sl2_code_display").prop('checked', false);
 
@@ -282,17 +282,17 @@ $("#phonemic_sl2_display").change(function() {
 
         });
 
-$("#phonetic_sl1_display").change(function() {
+$("#pron_sl1_display").change(function() {
     //alert(this.id); // or 
     //alert($(this).attr('id'));
 
     if ($(this).is(":checked")){
-        $(".phonetic.sl1").show();
+        $(".pron.sl1").show();
         check_all_sl1();
         $(".form_bundle.sl1").show();
 
     }else{
-        $(".phonetic.sl1").hide();
+        $(".pron.sl1").hide();
         $("#all_sl1_display").prop('checked', false);
         hide_form_bundle_sl1();
     }
@@ -301,19 +301,19 @@ $("#phonetic_sl1_display").change(function() {
         });
 
 
-$("#phonetic_sl2_display").change(function() {
+$("#pron_sl2_display").change(function() {
     //alert(this.id); // or 
     //alert($(this).attr('id'));
 
     if ($(this).is(":checked")){
-        $(".phonetic.sl2").show();
+        $(".pron.sl2").show();
         check_all_sl2();
         $(".form_bundle.sl2").show();
 
 
 
     }else{
-        $(".phonetic.sl2").hide();
+        $(".pron.sl2").hide();
         $("#all_sl2_display").prop('checked', false);
         hide_form_bundle_sl2();
     }

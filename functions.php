@@ -587,7 +587,7 @@ function phonemic_edit($entry_id, $form_bundle_id, $form_id, $source_lang, $lang
                 
 
                   }
-*/
+  */
                   ?>
                      </div>
  
@@ -1276,7 +1276,7 @@ function sense_bundle_output_edit ($entry_id){
           ?>
           </div>
           
-          <div id="class_div_<?php echo $sense_bundle_id;?>">
+          <div id="class_div_<?php echo $sense_bundle_id; ?>">
 
             <?php
           $target_langs_info = $_SESSION['config_tls_'.$dic_name];
@@ -1914,7 +1914,7 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
 
 
                 ?>
-                <button items="<?php echo $number_of_items; ?>" id='add_gloss_<?php echo $sense_bundle_id; ?>_<?php echo $lang_code; ?>' bundle="<?php echo $sense_bundle_id; ?>" lang_code="<?php echo $lang_code; ?>" type="button"  class='btn btn-default btn-sm p-0 add_gloss'>
+                <button items="<?php echo $number_of_items; ?>" id='add_gloss_<?php echo $sense_bundle_id; ?>_<?php echo $lang_code; ?>' bundle="<?php echo $sense_bundle_id; ?>" lang_code="<?php echo $lang_code; ?>" target_lang="<?php echo $target_lang; ?>" type="button"  class='btn btn-default btn-sm p-0 add_gloss'>
                   <span class="material-icons md-18">add_box</span>
                 </button>
                 
@@ -1927,6 +1927,7 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
                 $('#add_gloss_<?php echo $sense_bundle_id; ?>_<?php echo $lang_code; ?>').on('click', function(){
                     
                     var lang_code = $(this).attr('lang_code');
+                    var target_lang = $(this).attr('target_lang');
                     var bundle = $(this).attr('bundle');
                     var items = $(this).attr('items');
                   //var select = document.getElementById('product_id');
@@ -1936,12 +1937,17 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
                     var gloss_div = "#gloss_bundle_"+bundle+"_"+lang_code;
                     var add_gloss = 1;
                     var items_new = parseInt(items)+1;
+                    console.log(lang_code);
+                    console.log(add_gloss);
+                    console.log(items);
+                    console.log(bundle);
+                    console.log(gloss_div);
                     $(this).attr('items', items_new);
                   
                   
                   $.ajax({
                       url:'edit_gloss.php',
-                      data:{bundle:bundle, lang_code:lang_code, add_gloss:add_gloss, items:items},
+                      data:{bundle:bundle, lang_code:lang_code, add_gloss:add_gloss, target_lang:target_lang, items:items},
                       type: 'POST',
                       success: function(data){
                           if(!data.error){
@@ -2048,13 +2054,20 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
         var first = $(this).attr('first');
         var gloss = $(this).val();
         var gloss_id = $(this).attr('gloss_id');
+        var update_gloss = 1;
+        console.log(lang_code);
+            console.log(gloss_id);
+            console.log(bundle);
+            console.log(gloss);
+            
+            //console.log(gloss_div);
 
         if(first==1){
           $(this).attr('first', 0);
           var bck_gloss = 1;
           console.log(gloss);
           $.ajax({
-          url:'update_gloss.php',
+          url:'edit_gloss.php',
           data:{gloss_id:gloss_id, bck_gloss:bck_gloss},
           type: 'POST',
           /*success: function(data){
@@ -2066,7 +2079,7 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
           
 
         })
-          var update_gloss = 1;
+          
           var div_modal="#modal_gloss_panel_".concat(bundle).concat("_").concat(lang_code);
           console.log(div_modal);
         $.ajax({
@@ -2086,11 +2099,8 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
 
 
         }
-
-        var update_gloss = 1;
-
         $.ajax({
-            url:'update_gloss.php',
+            url:'edit_gloss.php',
             data:{gloss:gloss, gloss_id:gloss_id, update_gloss:update_gloss},
             type: 'POST',
             success: function(data){
@@ -2236,25 +2246,32 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
         var first = $(this).attr('first');
         var gloss = $(this).val();
         var gloss_id = $(this).attr('gloss_id');
-
+        console.log(lang_code);
+            console.log(gloss_id);
+            console.log(gloss);
+            console.log(bundle);
+            var update_gloss = 1;
         if(first==1){
+
           $(this).attr('first', 0);
+
           var bck_gloss = 1;
+
           console.log(gloss);
+
           $.ajax({
-          url:'update_gloss.php',
+          url:'edit_gloss.php',
           data:{gloss_id:gloss_id, bck_gloss:bck_gloss},
           type: 'POST',
-          /*success: function(data){
-              if(!data.error){
-                  $(gloss_div).html(data);
+          //success: function(data){
+              //if(!data.error){
+           //       $(gloss_div).html(data);
 
-              }
-          }*/
+            //  }
+         // }
           
 
         })
-          var update_gloss = 1;
           var div_modal="#modal_gloss_panel_".concat(bundle).concat("_").concat(lang_code);
           console.log(div_modal);
         $.ajax({
@@ -2275,19 +2292,19 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
 
         }
 
-        var update_gloss = 1;
 
         $.ajax({
-            url:'update_gloss.php',
+            url:'edit_gloss.php',
             data:{gloss:gloss, gloss_id:gloss_id, update_gloss:update_gloss},
             type: 'POST',
             success: function(data){
-                
+                   console.log(gloss);
+
             }
             
 
           })
-
+       
     })
       </script>
                   <?php
@@ -2307,236 +2324,317 @@ function glosses_edit($sense_bundle_id, $target_lang, $lang_code){
 }
 //END // glosses function // END
 
-//START // classes function //START
+// START //classes function //START
 function classes_edit ($sense_bundle_id, $target_lang, $lang_code){
-        $dic_name = "";
+      $dic_name = "";
     include ("connection.php");
-    //START //classes //START
-   
- try {
-        
-        $result = $link->query("SELECT * FROM classes WHERE sense_bundle_id  = '$sense_bundle_id' ORDER BY class_id");
 
+  //START //classes //START
+  try {
 
-  
-      ?>
-        
-          
-
-      <div class="pb-1">
+    ?>
+    
+    <div class="pb-1">
       <div id="class_<?php echo $sense_bundle_id; ?>" class="col-12 col-xl-12 d-flex p-0 bd-highlight class_bundle">
-                        
-      <div id="class_field_tag_<?php echo $sense_bundle_id; ?>" class="pr-1 ml-auto field_tag tl<?php echo $target_lang; ?>">
-              <small>classe <?php echo "[$lang_code]"; ?></small>
+        <div id="class_field_tag_<?php echo $sense_bundle_id; ?>" class="pr-1 ml-auto field_tag tl<?php echo $target_lang; ?>">
+              <small>classe de palavra <?php echo "[$lang_code]"; ?></small>
               </div>
         
           <div>
-          <div class="pb-1 d-flex" id="class_bundle_<?php echo $sense_bundle_id; ?>_<?php echo $lang_code; ?>">
-
-
-
-        
-      <?php
-     
-            if($result->rowCount()>0){
-              $class_id="";
-            ?>
-      <select class="custom-select custom-select-sm ml-auto input_part_of_speech" bundle="<?php echo $sense_bundle_id; ?>" id="input_part_of_speech_<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>">
 
             <?php
+
+              $result = $link->query("SELECT * FROM classes WHERE sense_bundle_id  = '$sense_bundle_id' ORDER BY class_id");
+              $class_items = $result->rowCount();
+              $item_count=0;
+              $selected_ids =[];
+              
+
               foreach ($result as $key => $row){    
+                        
                 $class_id=$row["class_id"];
-                
-                try {
-                  $result = $link->query("SELECT * FROM class_names WHERE class_id  = '$class_id' AND lang_code = '$lang_code'");
-                    
-                        if($result->rowCount()>0){
-              
-                          foreach ($result as $row){
-                            $class_name_id_selected=$row["class_name_id"];
-                          }//foreach
-                  
-                        }else{
-                          $class_name_id_selected=14;
-
-                          //echo "A busca não retornou nenhum resultado.";
-                      } // if
+                $selected_ids[]=$class_id;
+              }//foreach
 
 
-                    } catch(PDOException $e){
-                      echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
-                    } // try
+              ?>
 
-
-            
-                          try{
-                            $result2 = $link->query("SELECT * FROM class_names WHERE lang_code = '$lang_code'");
-                            if($result2->rowCount()>0){
-              
-                              foreach ($result2 as $row){
-                                $class_id=$row["class_id"];
-                                $class_name_id=$row["class_name_id"];
-                                $class_name=$row["class_name"];
-                                if($class_name_id == $class_name_id_selected){
-                                  $selected = "selected"; 
-                                }else{
-                                  $selected = "";
-                                }
-
-                                ?>
-                                <option <?php echo $selected; ?> name_ref="<?php echo $class_name; ?>" value="<?php echo $class_id; ?>"><?php echo $class_name; ?></option>
-                              <?php
-                    
-
-
-                              }//foreach
-                      
-                            }else{
-          
-                              //echo "A busca não retornou nenhum resultado.";
-                          } // if
-          
-                            
-                          
-                    } catch(PDOException $e){
-                      echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
-                  } // try
-        
-                  } // foreach
-                ?>
-            </select>
-            <button id='del_part_of_speech__<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>' type="button" bundle="<?php echo $sense_bundle_id; ?>" lang_code="<?php echo $lang_code; ?>" class='btn btn-default btn-sm p-0 del_part_of_speech'>
-                  <span class="material-icons md-18">delete</span>
+                <button items="<?php echo $class_items; ?>" id='edit_class_<?php echo $lang_code; ?>' lang_code="<?php echo $lang_code; ?>" bundle="<?php echo $sense_bundle_id; ?>" type="button"  class='btn btn-default btn-sm p-0' data-toggle="modal" data-target="#class_bundle_modal_<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>">
+                  <span class="material-icons md-18">edit</span>
                 </button>
-                
-
-
-                <script type='text/javascript'> 
-          $('#del_part_of_speech__<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>').on('click', function(){
-         
-               var bundle = $(this).attr('bundle');
-                console.log(bundle);
-
-                div = "#class_div_".concat(bundle);
-                console.log(div);
-                del_class = 1;
-
             
-            $.ajax({
-                url:'edit_class.php',
-                data:{bundle:bundle, del_class:del_class},
-                type: 'POST',
-                success: function(data){
-                    if(!data.error){
-                        $(div).html(data);
 
-                    }
-                }
-                
 
-              })
+                <!-- Modal -->
+                <div id="class_bundle_modal_<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>" bundle="<?php echo $sense_bundle_id; ?>" class="modal fade class_modal" tabindex="-1" role="dialog" aria-labelledby="edit_class_modal_<?php echo $sense_bundle_id; ?>_<?php echo $lang_code; ?>_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="edit_class_bundle_modal_<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>_title">Classe de palavra</h5>
+                        <button type="button" class="close close_class" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="modal_class_panel">
+                      <div class="d-flex flex-column" style="overflow:scroll; height: 400px">
+                      
+                       
+                      <?php
 
-               
+
+
+
+
+                    try{
+                      $result2 = $link->query("SELECT * FROM class_names WHERE lang_code = '$lang_code' ORDER BY class_name");
+
+                      if($result2->rowCount()>0){
+                        $class_order = 1;
+                        //$dic_name = $_SESSION['dic_name'];
+
+                        $config_search = $_SESSION['config_search_'.$dic_name][0];
+                        $number_of_tls =$config_search['number_of_tls'];
+
+                        foreach ($result2 as $row){
+                      
+                          $class_id=$row["class_id"];
+                          $class_name_id=$row["class_name_id"];
+                          $class_name=$row["class_name"];
+                          $checked = "";
+
+
+                          if(in_array($class_id, $selected_ids)){
+                            $checked = "checked";
+                          }else{
+                            $checked = "";
+                          }
+              
+                          ?>
+
+                      <div class="form-check">
+                          <input class="form-check-input class_checkbox" type="checkbox" tl="<?php echo $target_lang; ?>" tls="<?php echo $number_of_tls; ?>" bundle="<?php echo $sense_bundle_id; ?>" class_id = "<?php echo $class_id; ?>" id="checkbox_class_<?php echo $sense_bundle_id; ?>_<?php echo $class_id; ?>_<?php echo $target_lang; ?>" order = "<?php echo $class_order; ?>" value='<?php echo $class_name; ?>' <?php echo $checked; ?>>
+                            <label class="form-check-label" for="class_<?php echo $class_id; ?>"><?php echo $class_name; ?></label><br>
+                      </div>
+                      <script>
+                        
+          $('#checkbox_class_<?php echo $sense_bundle_id; ?>_<?php echo $class_id; ?>_<?php echo $target_lang; ?>').change(function(){
+              var bundle = $(this).attr('bundle');
+              var class_name_ref = $(this).val();
+              var class_id = $(this).attr('class_id');
+              var class_order = $(this).attr('order');
+              var tls = $(this).attr('tls');
+              var tl = $(this).attr('tl');
+              console.log(bundle);
+              console.log(class_name_ref);
+              console.log(class_id);
+              console.log(class_order);
+              console.log(tls);
+              console.log(tl);
+              
+            
+              
+
+
+              if($(this).is(':checked')){
+                  var add_class = 1;
+
+                  $.ajax({
+                      url:'edit_class.php',
+                      data:{class_id:class_id, bundle:bundle, class_name_ref:class_name_ref, class_order:class_order, add_class:add_class},
+                      type: 'POST',
+                      success: function(data){
+                          /*
+                              if(!data.error){
+                              $(class_div).html(data);
+                  
+                              }
+                          */
+                      }
+                  
+                      })
+
+                      
+                      
+
+              }else{
+                  var del_class = 1;
+                  $.ajax({
+                      url:'edit_class.php',
+                      data:{class_id:class_id, bundle:bundle, del_class:del_class},
+                      type: 'POST',
+                      success: function(data){
+                          /*
+                              if(!data.error){
+                              $(class_div).html(data);
+                  
+                              }
+                          */
+                      }
+                  
+                      })
+
+                      
+                      
+                  
+                        }
+
+                        var target_lang = 0;
+                        var count = 0;
+                        
+                        //ProcessNext(target_lang, tls, bundle);
+          
+                        //ProcessNextModal(count, tls, bundle);
 
 
 
           })
-      </script>
-            <script>
+                
 
+
+
+
+
+
+                      </script>
+                          <?php
+                $class_order = $class_order +1;
+                                } // foreach     
+                            
+
+                      }else{
+                      }//if
+                                        
+                    } catch(PDOException $e){
+                    echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+                    } // try
+
+                        ?>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary close_class" data-dismiss="modal">Close</button>
+                    </div>
+                    </div>
+                </div>
+
+                </div>
+                <script>
+          $('#class_bundle_modal_<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>').on('hide.bs.modal', function () {
+            
+            var bundle = $(this).attr('bundle');
+
+            console.log(bundle);
+            var update_class_final = 1;
+            var div = "";
+            
+                div = '#class_div_'.concat(bundle);
+            
+                $.ajax({
+                    url:'edit_class.php',
+                    data:{bundle:bundle, update_class_final:update_class_final},
+                    type: 'POST',
+                    success: function(data){
+                            if(!data.error){
+                            $(div).html(data);
+                
+                            }
+                    }
+                
+            });
+
+
+
+          })                  
+                </script>
+              <?php
+
+
+
+            ?>
+
+              </div>
+              </div>
+
+
+
+     <?php
+     
+     try{
+      $result4 = $link->query("SELECT * FROM classes WHERE sense_bundle_id  = '$sense_bundle_id' ORDER BY class_id");
+      
+     } catch(PDOException $e){
+       echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+   } // try
+     
+
+
+       if($class_items >0){
+        ?>
+         <div id="class_bundle_<?php echo $sense_bundle_id ?>_<?php echo $target_lang ?>" class="class mt-2" style="display: true;">
+ 
+            <div id="class_panel" class="form-group d-flex flex-row-reverse pr-2 bd-highlight class tl<?php echo $target_lang ?>" style="display: true;">
+
+        <?php
+        foreach ($result4 as $key => $row){    
+          
+          $class_id=$row["class_id"];
+          try {
+            $result5 = $link->query("SELECT * FROM class_names WHERE class_id  = '$class_id' AND lang_code = '$lang_code'");
               
-            $('#input_part_of_speech_<?php echo $sense_bundle_id; ?>_<?php echo $target_lang; ?>').change(function(){
-                var bundle = $(this).attr('bundle');
-                var class_name_ref = $("option:selected", this).attr('name_ref');
-                var class_id = this.value;
-                console.log(class_name_ref);
-                console.log(class_id);
-                console.log(bundle);
+                  if($result5->rowCount()>0){
+        
+                    foreach ($result5 as $row){
+        
+                      $class_name_id=$row["class_name_id"];
+                      $class_name=$row["class_name"];
+                      
+            ?>
+            
+            <a class_id="<?php echo $class_id; ?>" id="class_display_btn_<?php echo $class_id; ?>_<?php echo $target_lang; ?>" class="part_of_speech">(<?php echo $class_name; ?>)</a>
+            
+            <script>
+                        
+                        $('#class_display_btn_<?php echo $class_id; ?>_<?php echo $target_lang; ?>').change(function(){
 
-                div = "#class_div_".concat(bundle);
-                console.log(div);
-                    $.ajax({
-                        url:'edit_class.php',
-                        data:{class_id:class_id, bundle:bundle, class_name_ref:class_name_ref, update_class:1},
-                        type: 'POST',
-                        success: function(data){
-                                if(!data.error){
-                                $(div).html(data);
-                    
-                                }
-                        }
-                    
                         })
-
-
-                    })
-                  
-
-
-
-
-              </script>
-
-
-                <?php
-            }else{
+                              
+              
+                      
+                                    </script>
+            <?php
+  
+                  } // foreach     
+              
+        
+                    }else{
+                      //echo "A busca não retornou nenhum resultado.";
+                  } // if
+        
+                    
+              } catch(PDOException $e){
+                echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+            } // try
+              } // foreach
 
               ?>
 
-          <button id='create_class_btn_<?php echo $lang_code; ?>_<?php echo $sense_bundle_id; ?>'  target_lang="<?php echo $target_lang; ?>" lang_code="<?php echo $lang_code; ?>" sense_bundle_id="<?php echo $sense_bundle_id; ?>" type="button"  class='btn btn-default ml-auto btn-sm p-0 create_class'>
-            <span class="material-icons md-18">create</span>
-          </button>  
-      <script>
-      $('#create_class_btn_<?php echo $lang_code; ?>_<?php echo $sense_bundle_id; ?>').on('click', function(){
-        console.log("oir");
-        var lang_code = $(this).attr('lang_code');
-        var sense_bundle_id = $(this).attr('sense_bundle_id');
-        //var select = document.getElementById('product_id');
-      //var index = $('#example').selectedIndex;
-      //var given_text = index.options[index].value;
-                  //            console.log(search);
-        var div = "#class_div_".concat(sense_bundle_id);
-        var create_class = 1;
-        var target_lang = $(this).attr('target_lang');
-    
-      
-      $.ajax({
-          url:'edit_class.php',
-          data:{sense_bundle_id:sense_bundle_id, lang_code:lang_code, target_lang:target_lang, create_class:create_class},
-          type: 'POST',
-          success: function(data){
-              if(!data.error){
-                  $(div).html(data);
-      
-              }
-          }
-          
-      
-        })
-      
-          
-    
-      
-      })
-      </script>
-          <?php
-          //echo "A busca não retornou nenhum resultado.";
-      } // if
+            </div>
+                    </div>
 
 
-      
-            ?>
-          </div>
-          </div>
-        </div>
-      </div>
-      
+              <?php
 
-     <?php
-
+            }else{
+              //echo "A busca não retornou nenhum resultado.";
+          } // if
+        ?>        </div>
+                       
+       <?php
+                    
     } catch(PDOException $e){
       echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
     } // try
+    
     //END //classes //END
 }
 //END // classes function // END
@@ -2548,7 +2646,7 @@ function scns_edit ($sense_bundle_id){
     
     //START //scn //START
     $lang_code = "lat";
-    $target_lang = 1;
+    $target_lang = 0;
 
     try{
 
@@ -2688,6 +2786,47 @@ function scns_edit ($sense_bundle_id){
                         </button>
                         </div>
                         </div>
+
+                        <script>
+    $('#add_scn_<?php echo $sense_bundle_id; ?>').on('click', function(){
+          
+          var lang_code = $(this).attr('lang_code');
+          var bundle = $(this).attr('bundle');
+          var items = $(this).attr('items');
+        //var select = document.getElementById('product_id');
+        //var index = $('#example').selectedIndex;
+        //var given_text = index.options[index].value;
+         console.log("add scn");
+          var scn_div = "#scn_div_".concat(bundle);
+          console.log(scn_div);
+          var add_scn = 1;
+          var items_new = parseInt(items)+1;
+          $(this).attr('items', items_new);
+      
+        
+        $.ajax({
+            url:'edit_scn.php',
+            data:{bundle:bundle, lang_code:lang_code, add_scn:add_scn, items:items},
+            type: 'POST',
+            success: function(data){
+                if(!data.error){
+                    $(scn_div).html(data);
+        
+                }
+            }
+            
+        
+        
+        
+        })
+        
+        
+        })
+
+        
+    </script>
+
+
         
                         <div id="scn_bundle_<?php echo $sense_bundle_id."_".$lang_code; ?>" class="col-12 col-xl-12 d-flex flex-column p-0 bd-highlight scn_bundle sl<?php echo $target_lang; ?>">
                               <div class="ml-auto"></div>
@@ -2768,34 +2907,34 @@ function scns_edit ($sense_bundle_id){
 
    <script>
 
-$('#scn_input_<?php echo $scn_id; ?>').keyup(function(){
-  var lang_code = $(this).attr('lang_code');
-        var bundle = $(this).attr('bundle');
-        var first = $(this).attr('first');
-        var scn = $(this).val();
-        var scn_id = $(this).attr('scn_id');
+  $('#scn_input_<?php echo $scn_id; ?>').keyup(function(){
+    var lang_code = $(this).attr('lang_code');
+          var bundle = $(this).attr('bundle');
+          var first = $(this).attr('first');
+          var scn = $(this).val();
+          var scn_id = $(this).attr('scn_id');
 
-        if(first==1){
-          $(this).attr('first', 0);
-          var bck_scn = 1;
-          $.ajax({
-          url:'update_scn.php',
-          data:{scn_id:scn_id, bck_scn:bck_scn},
-          type: 'POST',
-          success: function(data){
-            /*  if(!data.error){
-                  $(scn_div).html(data);
-      
-              }*/
+          if(first==1){
+            $(this).attr('first', 0);
+            var bck_scn = 1;
+            $.ajax({
+            url:'update_scn.php',
+            data:{scn_id:scn_id, bck_scn:bck_scn},
+            type: 'POST',
+            success: function(data){
+              /*  if(!data.error){
+                    $(scn_div).html(data);
+        
+                }*/
+            }
+            
+        
+          })
+        
+
+
+
           }
-          
-      
-        })
-      
-
-
-
-        }
 
 
         //var select = document.getElementById('product_id');
@@ -2911,44 +3050,6 @@ $('#scn_input_<?php echo $scn_id; ?>').keyup(function(){
             </div>
 
 
-    <script>
-    $('#add_scn_<?php echo $sense_bundle_id; ?>').on('click', function(){
-          
-          var lang_code = $(this).attr('lang_code');
-          var bundle = $(this).attr('bundle');
-          var items = $(this).attr('items');
-        //var select = document.getElementById('product_id');
-        //var index = $('#example').selectedIndex;
-        //var given_text = index.options[index].value;
-         console.log("add scn");
-          var scn_div = "#scn_div_".concat(bundle);
-          console.log(scn_div);
-          var add_scn = 1;
-          var items_new = parseInt(items)+1;
-          $(this).attr('items', items_new);
-      
-        
-        $.ajax({
-            url:'edit_scn.php',
-            data:{bundle:bundle, lang_code:lang_code, add_scn:add_scn, items:items},
-            type: 'POST',
-            success: function(data){
-                if(!data.error){
-                    $(scn_div).html(data);
-        
-                }
-            }
-            
-        
-        
-        
-        })
-        
-        
-        })
-
-        
-    </script>
 
     <?php
 
@@ -5346,7 +5447,7 @@ function videos_edit ($sense_bundle_id, $entry_ref){
               >
 
                 <source src="assets/video/<?php echo $mp4;?>" />
-<!--                <source src="assets/video/<?php echo "$ogv";?>" type="video/ogv" />-->
+  <!--                <source src="assets/video/<?php echo "$ogv";?>" type="video/ogv" />-->
                 <p class="vjs-no-js">
                   To view this video please enable JavaScript, and consider upgrading to a
                   web browser that
@@ -5369,7 +5470,7 @@ function videos_edit ($sense_bundle_id, $entry_ref){
             console.log('Element: entered fullscreen mode.');
           }
             
-});
+  });
         
           $('#video_btn_<?php echo $video_id;?>').click(function(e) {
               e.preventDefault();
@@ -7214,63 +7315,63 @@ function bck_whole_sense ($sense_bundle_id){
 
 function bck_single_sense ($sense_id){
   $dic_name = "";
-include ("connection.php");
-try {
-//session_start();
-//session_start();
-$result = $link->query("SELECT * FROM senses WHERE sense_id = '$sense_id'");
+  include ("connection.php");
+  try {
+  //session_start();
+  //session_start();
+  $result = $link->query("SELECT * FROM senses WHERE sense_id = '$sense_id'");
 
-if($result->rowCount()>0){
-  
-  foreach ($result as $row){
-      $def=$row["def"];
-      $entry_ref_first = $row["entry_ref"];
-      $pattern = array();
-      $pattern[0] = '/\'/i';
-      $pattern[1] = '/\"/i';
-      $entry_ref = preg_replace($pattern, '', $entry_ref_first);
+  if($result->rowCount()>0){
+    
+    foreach ($result as $row){
+        $def=$row["def"];
+        $entry_ref_first = $row["entry_ref"];
+        $pattern = array();
+        $pattern[0] = '/\'/i';
+        $pattern[1] = '/\"/i';
+        $entry_ref = preg_replace($pattern, '', $entry_ref_first);
 
-          
+            
 
-      $target_lang=$row["target_lang"];
-      $sense_bundle_id=$row["sense_bundle_id"];
-      $sense_order=$row["sense_order"];
-      $lang_code=$row["lang_code"];
-      $class=$row["class"];
-      $gloss=$row["gloss"];
+        $target_lang=$row["target_lang"];
+        $sense_bundle_id=$row["sense_bundle_id"];
+        $sense_order=$row["sense_order"];
+        $lang_code=$row["lang_code"];
+        $class=$row["class"];
+        $gloss=$row["gloss"];
 
-        //if ($def==""){
+          //if ($def==""){
 
-      //}else{
+        //}else{
 
-          try{
-              $sql = "INSERT INTO senses_bck (sense_bundle_id, entry_ref, sense_id, sense_order, target_lang, lang_code, class, gloss, def) 
-              VALUES (:sense_bundle_id, :entry_ref, :sense_id, :sense_order, :target_lang, :lang_code, :class, :gloss, :def)";
-              $stmnt = $link->prepare($sql);
-          
-              $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':sense_id'=>$sense_id, ':sense_order'=>$sense_order, ':target_lang'=>$target_lang, ':lang_code'=>$lang_code, ':class'=>$class, ':gloss'=>$gloss, ':def'=>$def];
-              $stmnt->execute($entry_data);
-          
+            try{
+                $sql = "INSERT INTO senses_bck (sense_bundle_id, entry_ref, sense_id, sense_order, target_lang, lang_code, class, gloss, def) 
+                VALUES (:sense_bundle_id, :entry_ref, :sense_id, :sense_order, :target_lang, :lang_code, :class, :gloss, :def)";
+                $stmnt = $link->prepare($sql);
+            
+                $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':sense_id'=>$sense_id, ':sense_order'=>$sense_order, ':target_lang'=>$target_lang, ':lang_code'=>$lang_code, ':class'=>$class, ':gloss'=>$gloss, ':def'=>$def];
+                $stmnt->execute($entry_data);
+            
 
-          } catch(PDOException $e){
-              echo "Erro:222 ".$e->getMessage();
-          }//try
+            } catch(PDOException $e){
+                echo "Erro:222 ".$e->getMessage();
+            }//try
 
-      //}//if
-
-
-    } // foreach      
-
-  }else{
-    //echo "A busca não retornou nenhum resultado.";
-  } // if
+        //}//if
 
 
+      } // foreach      
+
+    }else{
+      //echo "A busca não retornou nenhum resultado.";
+    } // if
 
 
-} catch(PDOException $e){
-  echo "Erro:333 ".$e->getMessage();
-}
+
+
+  } catch(PDOException $e){
+    echo "Erro:333 ".$e->getMessage();
+  }
 }
 
 function bck_all_glosses ($sense_bundle_id){
@@ -7401,8 +7502,10 @@ function del_whole_entry_bundle($entry_bundle_id){
   }//try
 
 
-unset($_SESSION["entry_bundle_id"]);
+  //unset($_SESSION['config_search_'.$dic_name][0]['entry_bundle_id']);
+  //unset($_SESSION["entry_bundle_id"]);
 
+  $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] = 0;
   
 }
 
@@ -7720,6 +7823,7 @@ function del_phonemic ($phonemic_id){
     }//try
 
 }
+
 function del_form_bundle ($entry_id){
   $dic_name = "";
   include ("connection.php");
@@ -7740,6 +7844,7 @@ function del_form_bundle ($entry_id){
 
 
 }
+
 function del_form ($form_id){
   
   $dic_name = "";
@@ -7785,6 +7890,7 @@ function del_form ($form_id){
 
 
 }
+
 function del_all_sense_bundles_complete($entry_id){
 
   
@@ -7818,7 +7924,7 @@ function del_all_sense_bundles_complete($entry_id){
   }//try
   
   
-  }
+}
 
 
 function bck_all_sense_bundles_complete($entry_id){
@@ -7863,7 +7969,7 @@ function bck_all_sense_bundles_complete($entry_id){
   }//try
   
   
-  }
+}
 
 
 
@@ -7893,7 +7999,7 @@ function del_entry_bundle($entry_blundle_id){
 
   } catch(PDOException $e){
     echo "Erro: oi1".$e->getMessage();
-}//try
+  }//try
 
 
 
@@ -7921,19 +8027,19 @@ function del_entry_bundle($entry_blundle_id){
 
 
 
-try{
-  $result = $link->query("SELECT * FROM form_bundles WHERE form_bundle_id = '$form_bundle_id'");
-  if($result->rowCount()>0){
-      foreach ($result as $row){
-      $entry_id = $row['entry_id']; 
+  try{
+    $result = $link->query("SELECT * FROM form_bundles WHERE form_bundle_id = '$form_bundle_id'");
+    if($result->rowCount()>0){
+        foreach ($result as $row){
+        $entry_id = $row['entry_id']; 
 
-      }//foreach
-  }else{}//if
+        }//foreach
+    }else{}//if
 
 
-} catch(PDOException $e){
-  echo "Erro: oi1".$e->getMessage();
-}//try
+  } catch(PDOException $e){
+    echo "Erro: oi1".$e->getMessage();
+  }//try
 
 
   //del_whole_sense ($sense_bundle_id);

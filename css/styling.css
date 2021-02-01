@@ -38,22 +38,90 @@ input[type=text]:focus {
   min-height: 100%;
 
 }
+/* font converted using font-converter.net. thank you! */
+@font-face {
+  font-family: "Calibri";
+  src: url("../assets/fonts/calibri.eot"); /* IE9 Compat Modes */
+  src: url("../assets/fonts/calibri.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("../assets/fonts/calibri.otf") format("opentype"), /* Open Type Font */
+    url("../assets/fonts/calibri.svg") format("svg"), /* Legacy iOS */
+    url("../assets/fonts/calibri.ttf") format("truetype"), /* Safari, Android, iOS */
+    url("../assets/fonts/calibri.woff") format("woff"), /* Modern Browsers */
+    url("../assets/fonts/calibri.woff2") format("woff2"); /* Modern Browsers */
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+/* Style all font awesome icons */
+.fa {
+  padding: 20px;
+  font-size: 30px;
+  width: 50px;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Add a hover effect if you want */
+.fa:hover {
+  opacity: 0.7;
+}
+
+/* Set a specific color for each brand */
+
+/* Facebook */
+.fa-facebook {
+  background: #3B5998;
+  color: white;
+}
+
+/* Twitter */
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+}
 
 
- @font-face {
-  font-family: "Libertine";
-  src: url("../assets/fonts/LinLibertine_Rah.ttf");
+/* Whatsapp */
+.fa-whatsapp {
+  background: #25D366;
+  color: white;
+}
+
+/* Pinterest */
+.fa-pinterest {
+  background: #E60023;
+  color: white;
+}
+
+/* Pinterest */
+.fa-download {
+  background: #CFB53B;
+  color: white;
 }
 
  body {
      background-color: #f1ece2c0;
      color: #000036;
-     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+     font-family: "Calibri", auto, sans-serif;
+
  }
 
 
  .entry_select{
   background-color: #f5ede0a2;
+  color:  #050300a2;
+  font-size: .9em;
+  padding: 0em;
+  padding-left: 1em;
+
+
+ }
+
+ .entry_select:focus, .entry_select:active{
+
+  background-color: #050300a2;
+  color: #f5ede0a2;
   font-size: .9em;
   padding: 0em;
   padding-left: 1em;
@@ -678,6 +746,17 @@ text {
 
 }
 
+
+
+
+.nav-link {
+
+  color: #a02a2a;
+
+
+  background-color: transparent;
+
+}
 
 
 

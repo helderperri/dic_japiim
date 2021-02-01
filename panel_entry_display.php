@@ -3,9 +3,31 @@
     include ("connection.php");
 
 
-if (session_status() == PHP_SESSION_NONE) {
-  session_start();
+      if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+      }
+
+
+      
+function logged_in2(){
+  if(isset($_SESSION["user_sub"])){
+      return true;
+    //$user_sub = $_SESSION["user_sub"];
+  
+  }elseif(isset($_COOKIE["user_sub"])){
+    return true;
+  }else{
+
+    
+
+  
+      return false;
+   
+
 }
+  
+  }
+
 
 //$dic_name = $_SESSION['dic_name'];
 
@@ -21,6 +43,29 @@ if(isset($_POST['mode'])){
 } 
 
 
+if(isset($_POST['entry_bundle_id'])){
+  $entry_bundle_id = $_POST['entry_bundle_id'];
+  $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] = $entry_bundle_id;
+  entry_output($entry_bundle_id, $mode);
+  
+  ?>
+  
+  <script src="https://vjs.zencdn.net/7.8.4/video.js"></script>
+  <?php
+  
+  }else{
+  
+    $entry_bundle_id = $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'];
+    entry_output($entry_bundle_id, $mode);
+    
+    ?>
+    
+    <script src="https://vjs.zencdn.net/7.8.4/video.js"></script>
+    <?php
+    
+
+  }
+  
 //START // function form_bundle_output //START
 function form_bundle_output($entry_id, $mode){
         $dic_name = "";
@@ -95,8 +140,30 @@ function vernacular($form_bundle_id, $source_lang, $lang_code, $mode){
                 $is_hidden = "block";
               };
 
+
+              $user_id = "";
+
+              if(logged_in2()){
+
+                $is_hidden2 = "block";
+                $user_id = $_SESSION["user_sub"];
+
+              }else{
+                $is_hidden2 = "none";
+
+              }
+
+
+
+
+
+
           ?>
           <div id="form_bundle_<?php echo $form_id; ?>" class="col-12 col-xl-12 d-flex p-0 bd-highlight form_bundle sl<?php echo $source_lang; ?>">
+          <button id="add_word_btn_<?php echo $form_id; ?>" user_id = "<?php echo $user_id; ?>" form_id="<?php echo $form_id; ?>" href="#" form_bundle_id = "<?php echo $form_bundle_id; ?>" lang_code = "<?php echo $lang_code; ?>" dic_name = "<?php echo $dic_name; ?>"  type="button" class='btn btn-default mr-auto add_word sl<?php echo $source_lang; ?> p-0 pl-2' style="display:<?php echo $is_hidden2;?>">
+                <span class="material-icons md-18">add</span>
+              </button>
+          
           <div id="lang_code_<?php echo $form_id; ?>" class="mr-auto pl-1 pt-2 lang_code sl<?php echo $source_lang; ?>" style="display:<?php echo $is_hidden;?>">
           <?php echo "[$lang_code]"; ?>
           </div>
@@ -109,6 +176,42 @@ function vernacular($form_bundle_id, $source_lang, $lang_code, $mode){
               ?>  
               </div>
         </div>  
+
+        <script>
+        $("#add_word_btn_<?php echo $form_id; ?>").on('click', function(){
+
+          var lang_code = $(this).attr('lang_code');
+          var form_bundle_id = $(this).attr('form_bundle_id');
+          var form_id = $(this).attr('form_id');
+          var user_id = $(this).attr('user_id');
+          var dic_name = $(this).attr('dic_name');
+          var add_word = 1;
+          
+          console.log("testando 0");
+
+          
+
+          $.ajax({
+                url:'add_word_to_list.php',
+                data:{user_id:user_id, dic_name:dic_name, form_bundle_id:form_bundle_id, form_id:form_id, lang_code:lang_code, add_word:add_word},
+                type: 'POST',
+                success: function(data){
+                    if(!data.error){
+                        //$('#entry_display').html(data);
+                    console.log("testando 1");
+                    console.log(form_bundle_id);
+                    
+            
+                    }
+                }
+            })
+
+
+
+
+        })
+        
+            </script>
         <?php
   
         } // foreach   
@@ -146,7 +249,7 @@ function phonemic($form_id, $source_lang, $mode){
             $phonemic_id=$row["phonemic_id"];
             $phonemic=$row["phonemic"];
           ?>
-              <div id="phonemic_bundle_<?php echo $phonemic_id; ?>" class="ml-auto d-flex flex-row p-2 bd-highlight phonemic_bundle sl<?php echo $source_lang; ?>">
+              <div id="phonemic_bundle_<?php echo $phonemic_id; ?>" class="ml-auto d-flex flex-wrap p-2 bd-highlight phonemic_bundle sl<?php echo $source_lang; ?>">
               <div id="phonemic_<?php echo $phonemic_id; ?>" class="phonemic sl<?php echo $source_lang; ?>" style="display:<?php echo $is_hidden;?>;">
                  <?php
           if($mode==1){
@@ -262,7 +365,7 @@ function prons($phonetic_id, $source_lang, $mode){
 
         ?>
         <div class="pron sl<?php echo $source_lang ?>" style="display:<?php echo $is_hidden;?>">
-            <button id='<?php echo $pron_id;?>' type="button"  audio="assets/audio/<?php echo $wav?>" class='btn btn-default btn-sm btnpron p-0'>
+            <button id='<?php echo $pron_id;?>' type="button"  audio="assets/audio/<?php echo $wav?>" class='btn btn-default btn-sm btnpron d-inline-flex p-0'>
                 <span class="material-icons md-18">volume_up</span>
             </button>
         </div>
@@ -272,11 +375,15 @@ function prons($phonetic_id, $source_lang, $mode){
             <!-- <source id="<?php echo $pron_id;?>_ogg" src="#" type="audio/ogg">
             <source id="<?php echo $pron_id;?>_mp3" src="assets/audio/<?php echo $mp3?>" type="audio/mpeg">
             -->
-            </audio> 
+            </audio>
+
+
   
   
               <?php
-          
+
+            prons_meta($pron_id, $lang_code, $source_lang, $mode);
+
         } // foreach   
         }else{
 
@@ -291,6 +398,120 @@ function prons($phonetic_id, $source_lang, $mode){
     //END //prons //END 
 }
 //END // function prons // END//
+
+
+
+function prons_meta($pron_id, $lang_code, $source_lang, $mode){
+  $dic_name = "";
+  include ("connection.php");
+
+  try {
+    $result = $link->query("SELECT * FROM prons_meta WHERE pron_id = '$pron_id'");
+    if($result->rowCount()>0){
+        
+      foreach ($result as $key => $row){
+        $lang_code=$row["lang_code"];
+        $pron_meta_id=$row["pron_meta_id"];
+        $file_name=$row["file_name"];
+        $collector=$row["collector"];
+        $speaker=$row["speaker"];
+        $rec_date=$row["rec_date"];
+        $rec_place=$row["rec_place"];
+        $description=$row["description"];
+
+        /*$pron_meta_display = $_SESSION['config_sls_'.$dic_name][$source_lang-1]['pron_meta_display'];
+        $is_hidden = "";
+        if($pronunciation_display==0){
+          $is_hidden = "none";
+        }elseif($pronunciation_display==1){
+          $is_hidden = "block";
+        };
+
+      <div class="pron_meta sl<?php echo $source_lang ?>" style="display:<?php echo $is_hidden;?>">
+        */
+
+
+
+        
+  ?>
+
+  <div class="pron_meta sl<?php echo $source_lang ?>">
+            <button id='<?php echo $pron_id;?>' type="button"  class='btn btn-default btn-sm btn_meta d-inline-flex p-0' data-toggle="modal" data-target="#pron_meta_modal_<?php echo $pron_meta_id; ?>">
+                <span class="material-icons md-18">info</span>
+            </button>
+        </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="pron_meta_modal_<?php echo $pron_meta_id; ?>" tabindex="-1" role="dialog" aria-labelledby="pron_meta_modal_title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="pron_meta_modal_title">Metadados</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" id="pron_meta_panel_<?php echo $pron_meta_id; ?>">
+
+                    <div class="d-flex flex-column">
+                    <div id="pron_meta_speaker_<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Falante:&nbsp;</b><?php echo $speaker; ?>
+                    </div>
+                    <div id="pron_meta_lang_<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Língua:&nbsp;</b><?php echo $lang_code; ?>
+                    </div>
+                    <div id="pron_meta_rec_place<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Localidade:&nbsp;</b><?php echo $rec_place;?>
+                    </div>
+                    <div id="pron_meta_rec_date_<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Data da gravação:&nbsp;</b><?php echo $rec_date; ?>
+                    </div>
+                    <div id="pron_meta_description_<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Descrição:&nbsp;</b><?php echo $description; ?>
+                    </div>
+                    <div id="pron_meta_collector_<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Coletor:&nbsp;</b><?php echo $collector; ?>
+                    </div>
+                    <div id="pron_meta_file_name_<?php echo $pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Nome do arquivo:&nbsp;</b><?php echo $file_name; ?>
+                    </div>
+
+
+                    </div>
+                
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+        
+
+
+
+              <?php
+
+
+        } // foreach   
+        }else{
+
+            //echo "A busca não retornou nenhum resultado.";
+      } // if
+
+
+
+    } catch(PDOException $e){
+    echo "Opps, houve um erro na sua busca<br><br> 438?".$e->getMessage();
+    } // try    
+
+
+
+}
+
 //END // PART 1 - FORM // END//
   
   
@@ -827,6 +1048,8 @@ function example_vernacular ($example_bundle_id, $lang_code, $source_lang, $new)
 }
 //END //example_vernacular function//END
 
+
+
 //START //example_prons function  //START
 
 function example_prons($example_id, $lang_code, $source_lang){
@@ -869,7 +1092,7 @@ function example_prons($example_id, $lang_code, $source_lang){
       </audio> 
  
     <?php
-
+      example_prons_meta($example_pron_id, $lang_code, $source_lang, $mode);
 
   }// foreach
 
@@ -882,50 +1105,163 @@ function example_prons($example_id, $lang_code, $source_lang){
 }
 
 
+function example_prons_meta($example_pron_id, $lang_code, $source_lang, $mode){
+  $dic_name = "";
+  include ("connection.php");
+
+  try {
+    $result = $link->query("SELECT * FROM example_prons_meta WHERE example_pron_id = '$example_pron_id'");
+    if($result->rowCount()>0){
+        
+      foreach ($result as $key => $row){
+        $lang_code=$row["lang_code"];
+        $example_pron_meta_id=$row["pron_meta_id"];
+        $file_name=$row["file_name"];
+        $collector=$row["collector"];
+        $speaker=$row["speaker"];
+        $rec_date=$row["rec_date"];
+        $rec_place=$row["rec_place"];
+        $description=$row["description"];
+
+        /*$pron_meta_display = $_SESSION['config_sls_'.$dic_name][$source_lang-1]['pron_meta_display'];
+        $is_hidden = "";
+        if($pronunciation_display==0){
+          $is_hidden = "none";
+        }elseif($pronunciation_display==1){
+          $is_hidden = "block";
+        };
+
+      <div class="pron_meta sl<?php echo $source_lang ?>" style="display:<?php echo $is_hidden;?>">
+        */
+
+
+
+        
+  ?>
+
+  <div class="example_pron_meta sl<?php echo $source_lang ?>">
+            <button id='<?php echo $example_pron_id;?>' type="button"  class='btn btn-default btn-sm btn_meta d-inline-flex p-0' data-toggle="modal" data-target="#example_pron_meta_modal_<?php echo $example_pron_meta_id; ?>">
+                <span class="material-icons md-18">info</span>
+            </button>
+        </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="example_pron_meta_modal_<?php echo $example_pron_meta_id; ?>" tabindex="-1" role="dialog" aria-labelledby="example_pron_meta_modal_title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="example_pron_meta_modal_title">Metadados</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" id="example_pron_meta_panel_<?php echo $example_pron_meta_id; ?>">
+
+                    <div class="d-flex flex-column">
+                    <div id="example_pron_meta_speaker_<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Falante:&nbsp;</b><?php echo $speaker; ?>
+                    </div>
+                    <div id="example_pron_meta_lang_<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Língua:&nbsp;</b><?php echo $lang_code; ?>
+                    </div>                    
+                    <div id="example_pron_meta_rec_place<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Localidade:&nbsp;</b><?php echo $rec_place;?>
+                    </div>
+                    <div id="example_pron_meta_rec_date_<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Data da gravação:&nbsp;</b><?php echo $rec_date; ?>
+                    </div>
+                    <div id="example_pron_meta_description_<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Descrição:&nbsp;</b><?php echo $description; ?>
+                    </div>
+                    <div id="example_pron_meta_collector_<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Coletor:&nbsp;</b><?php echo $collector; ?>
+                    </div>
+                    <div id="example_pron_meta_file_name_<?php echo $example_pron_meta_id; ?>" class="mr-auto mr-4 pron_meta sl<?php echo $source_lang;?>">
+                    <b>Nome do arquivo:&nbsp;</b><?php echo $file_name; ?>
+                    </div>
+
+
+                    </div>
+                
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+        
+
+
+
+              <?php
+
+
+        } // foreach   
+        }else{
+
+            //echo "A busca não retornou nenhum resultado.";
+      } // if
+
+
+
+    } catch(PDOException $e){
+    echo "Opps, houve um erro na sua busca<br><br> 438?".$e->getMessage();
+    } // try    
+
+
+
+}
+
+
+
 function example_phonetic($example_id, $lang_code, $source_lang){
   $dic_name = "";
-include ("connection.php");
-//START //example_prons //START
-try {
+  include ("connection.php");
+  //START //example_prons //START
+  try {
 
-$result = $link->query("SELECT * FROM example_prons WHERE example_id  = '$example_id' ORDER BY example_id");
+  $result = $link->query("SELECT * FROM example_prons WHERE example_id  = '$example_id' ORDER BY example_id");
 
-if($result->rowCount()>0){
-  foreach ($result as $key => $row){
-    $example_pron_id=$row["example_pron_id"];                    
-    $ex_phonetic=$row["phonetic"];                    
-    $wav=$row["wav"];
-    $mp3=$row["mp3"];
-    $mp4=$row["mp4"];
-    $wma=$row["wma"];
+  if($result->rowCount()>0){
+    foreach ($result as $key => $row){
+      $example_pron_id=$row["example_pron_id"];                    
+      $ex_phonetic=$row["phonetic"];                    
+      $wav=$row["wav"];
+      $mp3=$row["mp3"];
+      $mp4=$row["mp4"];
+      $wma=$row["wma"];
 
- 
-if(!empty($ex_phonetic)){
-$example_phonetic_display = $_SESSION['config_sls_'.$dic_name][$source_lang-1]['example_phonetic'];
-$is_hidden = "";
-if($example_phonetic_display==0){
-  $is_hidden = "none";
-}elseif($example_phonetic_display==1){
-  $is_hidden = "block";
-};
-?>
+  
+  if(!empty($ex_phonetic)){
+  $example_phonetic_display = $_SESSION['config_sls_'.$dic_name][$source_lang-1]['example_phonetic'];
+  $is_hidden = "";
+  if($example_phonetic_display==0){
+    $is_hidden = "none";
+  }elseif($example_phonetic_display==1){
+    $is_hidden = "block";
+  };
+  ?>
 
 
-<div class="example_phonetic sl<?php echo $source_lang ?>" style="display:<?php echo $is_hidden;?>">
-    <div class="d-flex ml-auto pr-4 ex_phonetic"><?php echo $ex_phonetic; ?>
+  <div class="example_phonetic sl<?php echo $source_lang ?>" style="display:<?php echo $is_hidden;?>">
+      <div class="d-flex ml-auto pr-4 ex_phonetic"><?php echo $ex_phonetic; ?>
+      </div>
     </div>
-  </div>
-<?php
-}else{
-}//if !empty $ex_phonetic
+  <?php
+  }else{
+  }//if !empty $ex_phonetic
 
-}// foreach
+  }// foreach
 
-}//if
+  }//if
 
-} catch(PDOException $e){
-echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
-} // try
+  } catch(PDOException $e){
+  echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+  } // try
 
 }
 
@@ -997,7 +1333,7 @@ function images ($sense_bundle_id){
   
       if($result->rowCount()>0){
         ?>  
-        <div id="image_panel" class="image pb-1"">
+        <div id="image_panel" class="image pb-1">
           <div id="image_panel_<?php echo $sense_bundle_id ?>" class="d-flex justify-content-around p-0 bd-highlight image_panel">
         <?php                  
         foreach ($result as $key => $row){
@@ -1161,7 +1497,7 @@ function videos ($sense_bundle_id){
               >
 
                 <source src="assets/video/<?php echo $mp4;?>" />
-<!--                <source src="assets/video/<?php echo "$ogv";?>" type="video/ogv" />-->
+  <!--                <source src="assets/video/<?php echo "$ogv";?>" type="video/ogv" />-->
                 <p class="vjs-no-js">
                   To view this video please enable JavaScript, and consider upgrading to a
                   web browser that
@@ -1184,7 +1520,7 @@ function videos ($sense_bundle_id){
             console.log('Element: entered fullscreen mode.');
           }
             
-});
+  });
         
           $('#video_btn_<?php echo $video_id;?>').click(function(e) {
               e.preventDefault();
@@ -1283,6 +1619,156 @@ function entry_output($entry_bundle_id, $mode){
 
   ?>
 
+
+
+
+
+
+      <div class="share_div_<?php echo $entry_bundle_id; ?>">
+            <button id='share_btn_<?php echo $entry_bundle_id; ?>' type="button"  class='btn btn-default btn-sm btn_share p-0' data-toggle="modal" data-target="#share_btn_modal_<?php echo $entry_bundle_id; ?>">
+                <span class="material-icons md-18">share</span>
+            </button>
+        </div>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="share_btn_modal_<?php echo $entry_bundle_id; ?>" tabindex="-1" role="dialog" aria-labelledby="share_modal_title_<?php echo $entry_bundle_id; ?>" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="share_modal_title_<?php echo $entry_bundle_id; ?>">Compartilhar entrada</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" id="share_modal_panel_<?php echo $entry_bundle_id; ?>">
+
+                    <div class="d-flex flex-column">
+
+                    <!-- Your share button code -->
+                    <!--  
+                    <div id="card" class="fb-share-button pb-2" 
+                      data-href="index.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>" 
+                      data-layout="button">
+
+                      </div>
+                      -->
+                      <div class="pt-2">
+                      <img class="img-responsive" src="card_maker.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>" style="max-height:250px;">
+                     <!--
+                      <img src="create_card7.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>" alt="XXX" width="fit" height="auto">
+                      -->
+                          <?php
+
+                        
+
+
+                        ?>
+
+
+                      </div>
+                      <div class="pt-2">
+                      
+                      <a id="share_fb_<?php echo $entry_bundle_id; ?>" entry_bundle_id="<?php echo $entry_bundle_id; ?>" href="https://www.facebook.com/sharer/sharer.php?u=https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>" target="_blank" type="button" class="fa fa-facebook">
+                      </a>
+                      
+                      
+                      <a id="share_tw_<?php echo $entry_bundle_id; ?>" entry_bundle_id="<?php echo $entry_bundle_id; ?>" href="http://twitter.com/share?text=Palavra do Dia:&url=https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>" target="_blank" type="button" class="fa fa-twitter">
+                      </a>
+                      
+                      
+                      
+                      <a id="share_wp_<?php echo $entry_bundle_id; ?>" entry_bundle_id="<?php echo $entry_bundle_id; ?>" href="whatsapp://send?text=https://www.linguasyanomami.com/japiim/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>" target="_blank" type="button" class="fa fa-whatsapp">
+                      </a>
+                      
+                      
+                      
+                      <a id="share_pt_<?php echo $entry_bundle_id; ?>" entry_bundle_id="<?php echo $entry_bundle_id; ?>" href="https://pinterest.com/pin/create/button/?url=https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>&media=https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/card_maker.php?entry=<?php echo $entry_bundle_id; ?>&description=" target="_blank" type="button" class="fa fa-pinterest">
+                      </a>
+                      
+
+
+                      
+                      <a id="download_card_<?php echo $entry_bundle_id; ?>" entry_bundle_id="<?php echo $entry_bundle_id; ?>" type="button" class="fa fa-download">
+                      </a>
+                      
+                      
+                      </div>
+
+                    </div>
+ 
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+    $("#share_btn_<?php echo $entry_bundle_id; ?>").click(function(){
+      FB.XFBML.parse();
+    })
+      </script>
+
+
+
+<script>
+    $("#ddshare_fb_<?php echo $entry_bundle_id; ?>").click(function(){
+      FB.ui({
+          method: 'share',
+          href: 'https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>',
+          
+        }, function(response){});
+
+      })
+      </script>
+
+
+<script>
+    $("#download_card_<?php echo $entry_bundle_id; ?>").click(function(){
+
+      var entry_bundle_id = $(this).attr("entry_bundle_id");
+     var download = 1;
+     //var div = "#share_modal_panel_<?php echo $entry_bundle_id; ?>"
+     var file = "card_maker.php?entry=<?php echo $entry_bundle_id; ?>"
+
+      $.ajax({
+        url:'card_maker.php',
+        data:{entry_bundle_id:entry_bundle_id, download:download},
+        type: 'POST',
+        success: function(data){
+            if(!data.error){
+              location = file;
+              //$(div).html("baixou?");
+    
+            }
+        }
+        
+    
+    
+    
+    })
+
+    })
+      </script>
+
+
+
+     <!--
+       
+          
+        <script>(function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = "https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v3.0";
+                fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+      <div class="fb-share-button" data-href="https://japiim.linguasyanomami.com/dic/guato/index.php?entry=281&amp;rand3=43434" data-layout="button_count" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fjapiim.linguasyanomami.com%2Fdic%2Fguato%2Findex.php%3Fentry%3D<?php echo $entry_bundle_id; ?>%26rand3%3D<?php echo(rand(100000,999999)); ?>&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Partilhar</a></div>
+              -->
+
   <script type='text/javascript' src="js/sound.js"></script>
   <script type='text/javascript' src="js/image.js"></script>
   <!--<script type='text/javascript' src="js/entry_display_check.js"></script>
@@ -1293,19 +1779,5 @@ function entry_output($entry_bundle_id, $mode){
 }
 
 
-
-if(isset($_POST['entry_bundle_id'])){
-$entry_bundle_id = $_POST['entry_bundle_id'];
-
-entry_output($entry_bundle_id, $mode);
-
-?>
-
-<script src="https://vjs.zencdn.net/7.8.4/video.js"></script>
-<?php
-
-}else{
-
-}
 
     ?>

@@ -1,40 +1,110 @@
 <?php
-//require_once ('functions_search_panel.php'); 
-//require_once ('functions_lang_info.php');
-//require_once ('functions_others.php'); 
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+
+$dic_name = "";
+
+include ("connection.php");
+//include ("config_functions.php");
+
+$user_sub = "";
+
+if(isset($_SESSION["user_sub"])){
+
+  $user_sub = $_SESSION["user_sub"];
 
 
-//if  (isset($_POST['dic_name'])){
-  //$dic_name = $_POST['dic_name'];
-  //$_SESSION['dic_name'] = $dic_name;
+  }else{
 
-//}else{
-  //$_SESSION['dic_name'] = $dic_name;
-//}
-    $dic_name = "";
-    include ("connection.php");
+    if(isset($_COOKIE["user_sub"])){
 
-    if (session_status() == PHP_SESSION_NONE) {
-      session_start();
-    }else{
+    $user_sub = $_COOKIE["user_sub"];
+    $username = $_COOKIE['name'];
+    $user_picture = $_COOKIE['picture'];
+    $_SESSION['user_sub'] = $user_sub;
+    $_SESSION['name'] = $username;
+    $_SESSION['picture'] = $user_picture;
+
+
+
+
     }
-if(!isset($_SESSION['config_search_'.$dic_name][0])){
-  include ("config_session.php");
+}
+
+function logged_in(){
+  if(isset($_SESSION["user_sub"])){
+      return true;
+    //$user_sub = $_SESSION["user_sub"];
+  
+  }elseif(isset($_COOKIE["user_sub"])){
+    return true;
+  }else{
+
+    
+
+  
+      return false;
+   
+
+}
+  
+  }
+
+if(logged_in()){
+
+  
+
+    include ("config_session_users.php");
+
+
+  
+
+}else{
+
+  $user_sub ="";
+  
+  if(!isset($_SESSION['config_search_'.$dic_name])){
+  
+    include ("config_session.php");
+
+  //$_SESSION['config_search_'.$dic_name] = array();
+  }
+
+  $_SESSION['config_search_'.$dic_name][0]['mode'] = 1; 
+
 
 }
 
-$_SESSION['login_source'] = $dic_name;  
-$_SESSION['login_google'] = "";    
+
+/*
+if(isset($_COOKIE["user_sub"])){
+
+  $user_sub = $_COOKIE["user_sub"];
+  $username = $_COOKIE['name'];
+  $user_picture = $_COOKIE['picture'];
+  $_SESSION['user_sub'] = $user_sub;
+  $_SESSION['name'] = $username;
+  $_SESSION['picture'] = $user_picture;
+
+
+  }
 
 
 
-    $config_search= $_SESSION['config_search_'.$dic_name][0];
-    $mode = $config_search['mode'];   
+if(!isset($_SESSION['config_search_'.$dic_name])){
+  
+  include ("config_session.php");
+//$_SESSION['config_search_'.$dic_name] = array();
+}
+*/
+
+
+//$_SESSION['login_source'] = $dic_name;  
+//$_SESSION['login_google'] = "";    
 
 
 
-$source_langs_info = $_SESSION['config_sls_'.$dic_name];
-$target_langs_info = $_SESSION['config_tls_'.$dic_name];
 
 /*
 $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -43,34 +113,114 @@ $ip = $_SESSION['ip'];
 $loginTime = $_SESSION['loginTime'];
 */
 
-
-/*
-if(!isset($_POST['mode'])){
-
-  $config_search= $_SESSION['config_search_'.$dic_name][0];
-  $mode = $config_search['mode'];   
-
-    }else{
-      $mode = $_POST['mode'];
-      $_SESSION['config_search_'.$dic_name][0]['mode'] = $mode; 
-} 
-*/
-$entry_bundle_id = "";
-
-if(isset($_SESSION['new_entry_update'])){
+$config_search= $_SESSION['config_search_'.$dic_name][0];
+$mode = $config_search['mode'];   
+$entry_bundle_id = $config_search['entry_bundle_id'];
+$btn_id = $config_search['btn_id'];
 
 
-    $entry_bundle_id = $_SESSION['entry_bundle_id'];
-    
-    unset($_SESSION['new_entry_update']);
-    unset($_SESSION['entry_bundle_id']);
-  
+$source_langs_info = $_SESSION['config_sls_'.$dic_name];
+$target_langs_info = $_SESSION['config_tls_'.$dic_name];
+
+
+
+
+
+if(isset($_POST['entry_bundle_id'])){
+
+
+  $entry_bundle_id = $_POST['entry_bundle_id'];
+  $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] =  $entry_bundle_id;
+
 }
 
 
 
 
 
+if(isset($_POST['mode'])){
+
+  $mode = $_POST['mode'];
+  $_SESSION['config_search_'.$dic_name][0]['mode'] = $mode; 
+} 
+
+
+
+if(isset($_SESSION['new_entry_update'])){
+
+
+  $entry_bundle_id = $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'];
+  
+  unset($_SESSION['new_entry_update']);
+  //unset($_SESSION['entry_bundle_id']);
+
+}
+
+if(isset($_GET["entry"])){
+
+  $entry_bundle_id = $_GET["entry"];
+  $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] = $entry_bundle_id;
+
+}
+
+  
+if(isset($_GET["lang"])){
+
+  $lang = $_GET["lang"];
+
+
+
+
+
+    foreach($target_langs_info as $target_lang_info){
+
+
+      $lang_code = $target_lang_info["lang_code"];
+      $lang_number = $target_lang_info["target_lang"];
+      $display = 0;
+
+      if($lang_code == $lang){
+
+        $display = 1;
+
+
+
+      }else{
+        $display = 0;
+
+      }
+
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["class"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["gloss"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["def"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["example_translation"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["semantic"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["comments"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["lang_code_display"] = 0;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["image_caption"] = $display;
+      $_SESSION['config_tls_'.$dic_name][$lang_number-1]["video_caption"] = $display;
+
+
+    }
+
+  
+  
+
+
+}
+
+
+/*
+if(!isset($_SESSION['entry_bundle_id'])){
+
+
+  $_SESSION['entry_bundle_id'] = 0;
+  
+
+}
+*/
+
+//$entry_bundle_id = $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'];
 
 
 
@@ -83,10 +233,51 @@ if(isset($_SESSION['new_entry_update'])){
       <meta http-equiv='X-UA-Compatible' content='IE=edge'>
       <meta name='viewport' content='width=device-width, initial-scale= 1'>
       <title>
-        <?php 
-      echo implode('-', array_column($source_langs_info, 'native_name'));
-      ?>
+         <?php echo implode('-', array_column($source_langs_info, 'native_name'));?>
       </title>
+
+
+   
+      
+      <meta property="og:url"           content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>" />
+      <meta property="og:type"          content="website" />
+      <meta property="og:title"         content="Dicionário <?php echo implode('-', array_column($source_langs_info, 'native_name'));?> | Portal Japiim | ProDoclin" />
+      <meta property="og:description"   content="Conheça o Léxico das Línguas Indígenas do Brasil" />
+      <meta property="og:image"         content="card_maker.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>"/>
+
+      <meta property="fb:app_id" content="243857410489950">
+      <!--
+
+        <meta property="og:video" content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/assets/audio/palavra0001.mp3">
+        <meta property="og:video:secure_url" content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/assets/audio/palavra0001.mp3">
+        <meta property="og:video:type" content="video/mp4">
+        <meta property="og:video:width" content="480">
+        <meta property="og:video:height" content="50">
+
+
+      <meta property="og:type" content="video.movie">
+
+      <meta property="fb:app_id" content="1234567890987654321">
+        <meta property="fb:admins" content="9876543210,1234567">
+
+
+
+      <meta property="og:audio" content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/assets/audio/palavra0001.mp3" />
+      <meta property="og:audio:secure_url" content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/assets/audio/palavra0001.mp3" />
+      <meta property="og:audio:type" content="music.song" />
+      -->
+
+
+
+      <meta name="twitter:card" content="summary_large_image">
+      <!--<meta name="twitter:site" content="@site_username">-->
+      <meta name="twitter:title" content="Dicionário <?php echo implode('-', array_column($source_langs_info, 'native_name'));?> | Portal Japiim | ProDoclin">
+      <meta name="twitter:description" content="Conheça o Léxico das Línguas Indígenas do Brasil">
+      <!--<meta name="twitter:creator" content="@creator_username">-->
+      <meta name="twitter:image" content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/card_maker.php?entry=<?php echo $entry_bundle_id; ?>">
+      <meta name="twitter:domain" content="https://japiim.linguasyanomami.com/dic/<?php echo $dic_name; ?>/index.php?entry=<?php echo $entry_bundle_id; ?>&rand=<?php echo(rand(100000,999999)); ?>">
+
+
 
       <!-- Latest compiled and minified CSS -->
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -95,6 +286,8 @@ if(isset($_SESSION['new_entry_update'])){
 
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+        <!-- Add icon library -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!--
       <link rel="manifest" href="/site.webmanifest">
 -->
@@ -125,8 +318,26 @@ if(isset($_SESSION['new_entry_update'])){
 </head>
 
 <body>
+<div id="fb-root"></div>
+    
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_PT/sdk.js#xfbml=1&version=v9.0" nonce="okx26vXZ"></script>
+<!--
+<script>
+   (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "https://connect.facebook.net/pt_PT/sdk.js#xfbml=1&version=v9.0";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
 
+     window.fbAsyncInit = function(){  // this gets triggered when FB object gets initialized
+            console.log("FB Object initiated");
+            FB.XFBML.parse(); // now we can safely call parse method
+       };
 
+</script>
+      -->
         <nav role='navigation' class='navbar navbar-expand-md navbar-toggleable-sm navbar-dark navbar-custom fixed-top'>
 
                   
@@ -155,14 +366,21 @@ if(isset($_SESSION['new_entry_update'])){
                   };
 
 
-                  if(isset($_SESSION["accessToken"])){
+                  if(isset($_SESSION["name"])){
        
               ?>
 
                          <ul class='navbar-nav mt-0 mt-lg-0'>
           
                           <li class="nav-item" id="edit_mode_div" style="display:<?php echo $edit_is_hidden;?>;">
-                            <a id="edit_mode" display_mode="2" class="nav-link" href="#">Editar</a>
+                          <form action="index.php" method="post" hidden>
+                          <input type="text" id="modeEditEntryBundleId" value="<?php echo $entry_bundle_id; ?>" name="entry_bundle_id" >
+                          <input type="text" name="mode" value="2" >
+                          <input type="submit" class="nav-link" id="mode_2_submit" >
+                          </form>
+                          <a id="edit_mode" display_mode="2" class="nav-link" href="#">Editar</a>
+                            <!--
+                          -->
                           </li>
                          </ul>
                           <ul class='navbar-nav mt-0 mt-lg-0'>
@@ -171,11 +389,16 @@ if(isset($_SESSION['new_entry_update'])){
                   }
               ?>
                           <li class="nav-item" id="view_mode_div" style="display:<?php echo $view_is_hidden;?>;">
+                          <form action="index.php" method="post" hidden>
+                          <input type="text" id="modeViewEntryBundleId" value="<?php echo $entry_bundle_id; ?>" name="entry_bundle_id">
+                          <input type="text" name="mode" value="1" >
+                          <input type="submit" class="nav-link" id="mode_1_submit" >
+                          </form>
                             <a id="view_mode" display_mode="1" class="nav-link" href='#'>Publicar</a>
                           </li>
 
                           <?php
-                          if(isset($_SESSION["accessToken"])){
+                          if(isset($_SESSION["name"])){
 
                           ?>
                        
@@ -253,7 +476,7 @@ if(isset($_SESSION['new_entry_update'])){
              
                                 
         //if(isset($_SESSION["accessToken"]) or isset($_POST["otherToken"])){
-                        if(isset($_SESSION["accessToken"])){
+                        if(isset($_SESSION["name"])){
                           //$username = "nome";
                           //$user_picture = "picture";
                           $username = $_SESSION['name'];
@@ -380,7 +603,6 @@ $(document).ready(function(){
         </div>
             
           
-          
 
 <!--
     <script type='text/javascript' src="js/entry_display_setup.js"></script>
@@ -401,9 +623,10 @@ $(document).ready(function(){
       var logout_source = $(this).attr("dic_name");
       var redirect_link = "../../logout.php";
       var process_link = "../../logout_config.php";
+      var dic_name = $(this).attr("dic_name");
       $.ajax({
         url:process_link,
-        data:{logout_source:logout_source},
+        data:{logout_source:logout_source, dic_name:dic_name},
         type: 'POST',
         success: function(data){
             if(!data.error){
@@ -446,7 +669,8 @@ include ("entry_display_setup_js.php");
 </div>
 
 <div id="reload_entry_display_setup_js">
-<?php include("new_entry_nav_js.php"); ?>
+
+<?php include ("new_entry_nav_js.php"); ?>
 
 
 </div>

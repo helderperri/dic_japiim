@@ -4,18 +4,68 @@
     include ("connection.php");
 //include ("lang_check.php");
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    if(session_id() == '') {
+     session_start();
+    }
+  }
+  else {
+    if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+    }
+  }
+
+
+
+  $searchtype="";
+  $langtype="";
+  $number_of_sls ="";
+  $number_of_tls ="";
+  $image = "";
+  $video = "";
+  $scn = "";
+  //$mode = 2;
+  $mode = "";
+  //$entry_bundle_id = 139;
+  $entry_bundle_id = "";
+  $btn_id = "";
+  
+  
+  if(!empty($_SESSION['config_search_'.$dic_name])){
+
+    foreach($_SESSION['config_search_'.$dic_name] as $row){
+    
+    $searchtype=$row["search_type"];
+    $langtype=$row["lang_type"];
+    $number_of_sls =$row["number_of_sls"];
+    $number_of_tls =$row["number_of_tls"];
+    $image = $row["image"];
+    $video = $row["video"];
+    $scn = $row["scn"];
+    //$mode = 2;
+    $mode = $row["mode"];
+    //$entry_bundle_id = 139;
+    $entry_bundle_id = $row["entry_bundle_id"];
+    $btn_id = $row["btn_id"];
+
+    }
+
+    //$btn_id = $_SESSION['config_search_'.$dic_name][0]['btn_id'];
+
 }
+
+
+
 
 
 if(isset($_POST['langtype'])){
 
     $langtype = $_POST['langtype'];
   }else{
-    $config_search= $_SESSION['config_search_'.$dic_name][0];
+    //$config_search= $_SESSION['config_search_'.$dic_name][0];
   
-    $langtype = $config_search['langtype'];  
+    //$langtype = $config_search['langtype'];  
   
 }
 

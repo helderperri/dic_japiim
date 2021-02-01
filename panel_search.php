@@ -3,12 +3,65 @@
 //require_once ("functions_search_panel.php");
 //require_once ("functions_lang_info.php");
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    if(session_id() == '') {
+     session_start();
+    }
+  }
+  else {
+    if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+    }
+  }
 //$dic_name = $_SESSION['dic_name'];
 $dic_name = "";
     include ("connection.php");
+
+
+
+
+    $searchtype="";
+    $langtype="";
+    $number_of_sls ="";
+    $number_of_tls ="";
+    $image = "";
+    $video = "";
+    $scn = "";
+    //$mode = 2;
+    $mode = "";
+    //$entry_bundle_id = 139;
+    $selected_entry_bundle_id = "";
+    $selected_btn_id = "";
+    
+    
+  
+    if(!empty($_SESSION['config_search_'.$dic_name])){
+  
+      foreach($_SESSION['config_search_'.$dic_name] as $row){
+      
+      $searchtype=$row["search_type"];
+      $langtype=$row["lang_type"];
+      $number_of_sls =$row["number_of_sls"];
+      $number_of_tls =$row["number_of_tls"];
+      $image = $row["image"];
+      $video = $row["video"];
+      $scn = $row["scn"];
+      //$mode = 2;
+      $mode = $row["mode"];
+      //$entry_bundle_id = 139;
+      $selected_entry_bundle_id = $row["entry_bundle_id"];
+      $selected_btn_id = $row["btn_id"];
+  
+      }
+  
+      //$selected_entry_bundle_id = $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'];
+  
+  }
+  
+  
+
+
 
 
 if(isset($_POST['langtype'])){
@@ -16,10 +69,7 @@ if(isset($_POST['langtype'])){
   $langtype = $_POST['langtype'];
 
   $_SESSION['config_search_'.$dic_name][0]['langtype'] = $langtype; 
-    }else{
-  $config_search= $_SESSION['config_search_'.$dic_name][0];
-  $langtype = $config_search['langtype'];  
-
+  
 } 
 
 if(isset($_POST['searchtype'])){
@@ -32,11 +82,6 @@ if(isset($_POST['searchtype'])){
       $_SESSION['config_search_'.$dic_name][0]['searchtype'] = $searchtype;
     }
 
-    }else{
-    $config_search= $_SESSION['config_search_'.$dic_name][0];
-
-    $searchtype = $config_search['searchtype'];  
-
 }
 
 
@@ -45,32 +90,25 @@ if(isset($_POST['mode'])){
   $mode = $_POST['mode'];
   
   $_SESSION['config_search_'.$dic_name][0]['mode'] = $mode; 
-    }else{
-  $config_search= $_SESSION['config_search_'.$dic_name][0];
-  $mode = $config_search['mode'];   
-
-} 
+    }
 
 if(isset($_POST['btn_id'])){
 
     $btn_id = $_POST['btn_id'];
     
     $_SESSION['config_search_'.$dic_name][0]['btn_id'] = $btn_id; 
-      }else{
-    $config_search= $_SESSION['config_search_'.$dic_name][0];
-    $btn_id = 1;  
-  
-  } 
-  
 
-  if(isset($_POST['searchtext'])){
+}
+
+    $btn_id = $_SESSION['config_search_'.$dic_name][0]['btn_id']; 
+  
+$searchtext = "";
+
+if(isset($_POST['searchtext'])){
 
     $searchtext = $_POST['searchtext'];
     
-      }else{
-    $searchtext = "";  
-  
-  } 
+}
   
 
 if($langtype==1){
@@ -125,6 +163,7 @@ function find_entries($btn_id, $langtype, $searchtype, $lang_code){
     include ("connection.php");
   $mdarray = array();
   $count=0;
+  $bundle_id = "";
 
   if($searchtype==2){
     $table_to_search1 = "sds";
@@ -142,6 +181,98 @@ function find_entries($btn_id, $langtype, $searchtype, $lang_code){
     $id_tag = "form_id";
     $bundle_id_tag = "form_bundle_id";
     $entry_source_tag = "vernacular";
+
+
+
+
+
+    $entry_bundle_id="";
+    try {
+        $result = $link->query("SELECT * FROM $table_to_search1 WHERE $column_to_search1 = '$btn_id'");
+          
+              if($result->rowCount()>0){
+  
+                foreach ($result as $row){
+                  $sense_bundle_id=$row["sense_bundle_id"];
+  
+                  try{
+                    $result2 = $link->query("SELECT * FROM sense_bundles WHERE sense_bundle_id = '$sense_bundle_id'");
+            
+                        if($result2->rowCount()>0){
+              
+                            foreach ($result2 as $row){
+                              $entry_id=$row["entry_id"];
+  
+                              try{
+                                $result9 = $link->query("SELECT * FROM  entries WHERE entry_id = '$entry_id'");
+                                if($result9->rowCount()>0){
+                          
+                                  foreach ($result9 as $row){
+                                    $entry_bundle_id=$row['entry_bundle_id'];
+                                  }//foreach
+                                }//iff
+  
+                              } catch(PDOException $e){
+                                echo "Opps, houve um erro na busca1<br><br>".$e->getMessage();
+
+                            } // try
+
+                            
+                                  $result3 = $link->query("SELECT * FROM  $table_to_search2 WHERE entry_id = '$entry_id'");
+                                    
+                                    if($result3->rowCount()>0){
+                          
+                                        foreach ($result3 as $row){
+                                          $bundle_id=$row[$bundle_id_tag];
+  
+                                          try{
+                                            $result4 = $link->query("SELECT * FROM  $table_to_search3 WHERE lang_code = '$lang_code' AND $bundle_id_tag = '$bundle_id' ORDER BY $entry_source_tag COLLATE utf8mb4_unicode_ci");
+                                    
+                                                if($result4->rowCount()>0){
+                                      
+                                                    foreach ($result4 as $row){
+                                                      $id=$row[$id_tag];
+                                                      $entry_source =$row[$entry_source_tag];
+                                                      $zero_col=$count;
+                                                      $mdarray[$zero_col] = array($entry_source_tag => $entry_source, "entry_bundle_id" => $entry_bundle_id, "entry_id" => $entry_id, "id" => $id);
+                                                      $count++;                                    
+                                              
+                                                    } // foreach     
+                                              
+                                                }else{
+                                                  //echo "A busca não retornou nenhum resultado.";
+                                              } // if
+                                
+                                            } catch(PDOException $e){
+                                              echo "Opps, houve um erro na busca2<br><br>".$e->getMessage();
+                                          } // try
+                                             
+                                        } // foreach     
+                                  
+                                    }else{
+                                      //echo "A busca não retornou nenhum resultado.";
+                                  } // if
+                                }//foreach
+                              }//if
+                                } catch(PDOException $e){
+                                  echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+                              } // try
+                  
+                            } // foreach     
+                      
+                        }else{
+                          //echo "A busca não retornou nenhum resultado.";
+                      } // if
+        
+                    } catch(PDOException $e){
+                      echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+                  } // try
+  
+
+
+
+
+
     }elseif($langtype==2){
     $table_to_search2 = "sense_bundles";
     $table_to_search3 = "glosses";
@@ -149,87 +280,89 @@ function find_entries($btn_id, $langtype, $searchtype, $lang_code){
     $id_tag = "gloss_id";
     $bundle_id_tag = "sense_bundle_id";
     $entry_source_tag = "gloss";
+
+
+
+
+
+
+
+
+    $entry_bundle_id="";
+    try {
+        $result = $link->query("SELECT * FROM $table_to_search1 WHERE $column_to_search1 = '$btn_id'");
+          
+              if($result->rowCount()>0){
+  
+                foreach ($result as $row){
+                  $sense_bundle_id=$row["sense_bundle_id"];
+  
+                  try{
+                    $result2 = $link->query("SELECT * FROM sense_bundles WHERE sense_bundle_id = '$sense_bundle_id'");
+            
+                        if($result2->rowCount()>0){
+              
+                            foreach ($result2 as $row){
+                              $entry_id=$row["entry_id"];
+  
+                              try{
+                                $result9 = $link->query("SELECT * FROM  entries WHERE entry_id = '$entry_id'");
+                                if($result9->rowCount()>0){
+                          
+                                  foreach ($result9 as $row){
+                                    $entry_bundle_id=$row['entry_bundle_id'];
+                                  }//foreach
+                                }//iff
+  
+                              } catch(PDOException $e){
+                                echo "Opps, houve um erro na busca1<br><br>".$e->getMessage();
+                            } // try
+      
+                                          $bundle_id=$sense_bundle_id;
+  
+                                          try{
+                                            $result4 = $link->query("SELECT * FROM  $table_to_search3 WHERE lang_code = '$lang_code' AND $bundle_id_tag = '$bundle_id' ORDER BY $entry_source_tag COLLATE utf8mb4_unicode_ci");
+                                    
+                                                if($result4->rowCount()>0){
+                                      
+                                                    foreach ($result4 as $row){
+                                                      $id=$row[$id_tag];
+                                                      $entry_source =$row[$entry_source_tag];
+                                                      $zero_col=$count;
+                                                      $mdarray[$zero_col] = array($entry_source_tag => $entry_source, "entry_bundle_id" => $entry_bundle_id, "entry_id" => $entry_id, "id" => $id);
+                                                      $count++;                                    
+                                              
+                                                    } // foreach     
+                                              
+                                                }else{
+                                                  //echo "A busca não retornou nenhum resultado.";
+                                              } // if
+                                
+                                            } catch(PDOException $e){
+                                              echo "Opps, houve um erro na busca2<br><br>".$e->getMessage();
+                                          } // try
+                                             
+                                }//foreach
+                              }//if
+                                } catch(PDOException $e){
+                                  echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+                              } // try
+                  
+                            } // foreach     
+                      
+                        }else{
+                          //echo "A busca não retornou nenhum resultado.";
+                      } // if
+        
+                    } catch(PDOException $e){
+                      echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
+                  } // try
+  
+
+
+
   }
 
-  $entry_bundle_id="";
-  try {
-      $result = $link->query("SELECT * FROM $table_to_search1 WHERE $column_to_search1 = '$btn_id'");
-        
-            if($result->rowCount()>0){
-
-              foreach ($result as $row){
-                $sense_bundle_id=$row["sense_bundle_id"];
-
-                try{
-                  $result2 = $link->query("SELECT * FROM sense_bundles WHERE sense_bundle_id = '$sense_bundle_id'");
-          
-                      if($result2->rowCount()>0){
-            
-                          foreach ($result2 as $row){
-                            $entry_id=$row["entry_id"];
-
-                            try{
-                              $result9 = $link->query("SELECT * FROM  entries WHERE entry_id = '$entry_id'");
-                              if($result9->rowCount()>0){
-                        
-                                foreach ($result9 as $row){
-                                  $entry_bundle_id=$row['entry_bundle_id'];
-                                }//foreach
-                              }//iff
-
-                            } catch(PDOException $e){
-                              echo "Opps, houve um erro na busca1<br><br>".$e->getMessage();
-                          } // try
-    
-                                $result3 = $link->query("SELECT * FROM  $table_to_search2 WHERE entry_id = '$entry_id'");
-                                  
-                                  if($result3->rowCount()>0){
-                        
-                                      foreach ($result3 as $row){
-                                        $bundle_id=$row[$bundle_id_tag];
-
-                                        try{
-                                          $result4 = $link->query("SELECT * FROM  $table_to_search3 WHERE lang_code = '$lang_code' AND $bundle_id_tag = '$bundle_id' ORDER BY $entry_source_tag COLLATE utf8mb4_unicode_ci");
-                                  
-                                              if($result4->rowCount()>0){
-                                    
-                                                  foreach ($result4 as $row){
-                                                    $id=$row[$id_tag];
-                                                    $entry_source =$row[$entry_source_tag];
-                                                    $zero_col=$count;
-                                                    $mdarray[$zero_col] = array($entry_source_tag => $entry_source, "entry_bundle_id" => $entry_bundle_id, "entry_id" => $entry_id, "id" => $id);
-                                                    $count++;                                    
-                                            
-                                                  } // foreach     
-                                            
-                                              }else{
-                                                //echo "A busca não retornou nenhum resultado.";
-                                            } // if
-                              
-                                          } catch(PDOException $e){
-                                            echo "Opps, houve um erro na busca2<br><br>".$e->getMessage();
-                                        } // try
-                                           
-                                      } // foreach     
-                                
-                                  }else{
-                                    //echo "A busca não retornou nenhum resultado.";
-                                } // if
-                              }//foreach
-                            }//if
-                              } catch(PDOException $e){
-                                echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
-                            } // try
-                
-                          } // foreach     
-                    
-                      }else{
-                        //echo "A busca não retornou nenhum resultado.";
-                    } // if
-      
-                  } catch(PDOException $e){
-                    echo "Opps, houve um erro na sua busca<br><br>".$e->getMessage();
-                } // try
           
 
     return $mdarray;
@@ -266,6 +399,7 @@ function panel_search($btn_id, $searchtext, $langtype, $searchtype, $mode, $lang
     $bundle_id_tag = "form_bundle_id";
     $entry_source_tag = "vernacular";
     $config_ls = "config_sls_".$dic_name;
+
     }elseif($langtype==2){
     $table_to_search1 = "letters_target";
     $table_to_search2 = "glosses";
@@ -401,6 +535,10 @@ function panel_search($btn_id, $searchtext, $langtype, $searchtype, $mode, $lang
 
 
   }
+
+  $has_match = 0;
+  $selected_entry_bundle_id = $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'];
+
   ?>
   <div id="<?php echo $panel;?><?php echo $lang;?>_div" class="form-group mb-0 <?php echo $panel;?><?php echo $lang;?>"  style="display:<?php echo $is_hidden;?>">
   <label id="label_<?php echo $panel;?><?php echo $lang;?>" for="<?php echo $panel;?><?php echo $lang;?>"><b><?php echo $native_name;?></b></label>
@@ -414,9 +552,15 @@ function panel_search($btn_id, $searchtext, $langtype, $searchtype, $mode, $lang
                 $entry_source= $row["$entry_source_tag"];
                 $entry_id = $row["entry_id"];
                 $entry_bundle_id = $row["entry_bundle_id"];
+                $active = "";
+                if($entry_bundle_id == $selected_entry_bundle_id){
+
+                  $active = "active";
+                  $has_match = 1;
+                }
 
                 ?>
-                  <li id="<?php echo $id; ?>" mode="<?php echo $mode; ?>" class="list-group-item list-group-item-action list-group-item-light border-0 entry_select entry_<?php echo $panel;?><?php echo $lang;?>" entry_bundle_id="<?php echo $entry_bundle_id; ?>" value="<?php echo $entry_id; ?>"><?php echo $entry_source; ?></li>
+                  <li id="l<?php echo $lang;?>_<?php echo $entry_bundle_id; ?>" mode="<?php echo $mode; ?>" class="list-group-item list-group-item-action list-group-item-light border-0 entry_select entry_<?php echo $panel;?><?php echo $lang;?> <?php echo $active;?>"  entry_bundle_id="<?php echo $entry_bundle_id; ?>" value="<?php echo $entry_id; ?>"><?php echo $entry_source; ?></li>
                 <?php
               } //foreach          
 
@@ -426,9 +570,41 @@ function panel_search($btn_id, $searchtext, $langtype, $searchtype, $mode, $lang
     
 
           ?>
+
+          <?php
+
+          if($has_match == 1){
+          ?>
+
+      <script>
+
+        var element_id = "l<?php echo $lang;?>_<?php echo $selected_entry_bundle_id; ?>";
+        var element = document.getElementById(element_id);
+
+        element.scrollIntoView();
+        element.scrollIntoView(false);
+        element.scrollIntoView({block: "end"});
+        element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+        element.focus();
+
+      </script>
+
+      
+        <?php
+
+          }
+
+        ?>
+
+
     </div>
   </div>
   
+
+
+
+
+
       <?php
 
 if(!empty($_POST['reload'])){

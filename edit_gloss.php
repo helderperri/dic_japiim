@@ -1,270 +1,15 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+
     $dic_name = "";
     include ("connection.php");
 
 
-if(isset($_POST['lang_code'])){
-
-    $lang_code = $_POST['lang_code'];
-    
-      }else{
-  
-  } 
-  
-  if(isset($_POST['bundle'])){
-
-    $sense_bundle_id = $_POST['bundle'];
-    
-      }else{
-  
-  }
-
-  if(isset($_POST['gloss_id'])){
-
-    $gloss_id = $_POST['gloss_id'];
-    
-      }else{
-  
-  }
-
-  if(isset($_POST['gloss_order'])){
-
-    $gloss_order = $_POST['gloss_order'];
-    
-      }else{
-  
-  }
-
-  if(isset($_POST['gloss'])){
-
-    $gloss = $_POST['gloss'];
-    
-      }else{
-  
-  }
-
-  if(isset($_POST['items'])){
-
-    $items = $_POST['items'];
-    
-      }else{
-  
-  }
-
-if(isset($_POST['add_gloss'])){
-
+function reload_gloss($sense_bundle_id, $lang_code){
   try {
-    //session_start();
-    $sql = "INSERT INTO glosses (sense_bundle_id, entry_ref, gloss_order, target_lang, lang_code, class, gloss) 
-    VALUES (:sense_bundle_id, 'entry_ref', :gloss_order, 1, :lang_code, 'class', :gloss)";
-    $stmnt = $link->prepare($sql);
-
-    $entry_data = [':sense_bundle_id'=>$sense_bundle_id,':gloss_order'=>$items+1, ':lang_code'=>$lang_code, ':gloss'=>''];
-    $stmnt->execute($entry_data);
- 
-
-
-
-
-} catch(PDOException $e){
-    echo "Erro: ".$e->getMessage();
-}
-
-}
-
-
-
-if(isset($_POST['save_gloss'])){
-
-    try {
-      //session_start();
-      $sql = "UPDATE glosses SET gloss = :gloss WHERE gloss_id=:gloss_id";
-      $stmnt = $link->prepare($sql);
-  
-      $entry_data = [':gloss'=>$gloss,':gloss_id'=>$gloss_id];
-      $stmnt->execute($entry_data);
-   
-  
-  
-  
-  } catch(PDOException $e){
-      echo "Erro: ".$e->getMessage();
-  }
-  
-  }
-
-
-
-if(isset($_POST['del_gloss'])){
-
-    try {
-      //session_start();
-      //session_start();
-      $result = $link->query("SELECT * FROM glosses WHERE gloss_id = '$gloss_id'");
-
-      if($result->rowCount()>0){
-        
-        foreach ($result as $row){
-            $gloss=$row["gloss"];
-            $entry_ref=$row["entry_ref"];
-            $target_lang=$row["target_lang"];
-            $gloss_order=$row["gloss_order"];
-            $class=$row["class"];
-
-            if ($gloss==""){
-
-            }else{
-  
-                try{
-                    $sql = "INSERT INTO glosses_bck (sense_bundle_id, entry_ref, gloss_id, gloss_order, target_lang, lang_code, class, gloss) 
-                    VALUES (:sense_bundle_id, :entry_ref, :gloss_id, :gloss_order, :target_lang, :lang_code, :class, :gloss)";
-                    $stmnt = $link->prepare($sql);
-                
-                    $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':gloss_id'=>$gloss_id, ':gloss_order'=>$gloss_order, ':target_lang'=>$target_lang, ':lang_code'=>$lang_code, ':class'=>$class, ':gloss'=>$gloss];
-                    $stmnt->execute($entry_data);
-                
-
-                } catch(PDOException $e){
-                    echo "Erro: ".$e->getMessage();
-                }//try
-  
-            }//if
-
-
-          } // foreach      
-  
-        }else{
-          //echo "A busca não retornou nenhum resultado.";
-      } // if
-
-
-  try{
-      $sql2 = "DELETE FROM glosses WHERE gloss_id = :gloss_id";
-      $stmnt2 = $link->prepare($sql2);
-  
-      $entry_data2 = [':gloss_id'=>$gloss_id];
-      $stmnt2->execute($entry_data2);
-   
-
-  
-    
-    } catch(PDOException $e){
-        echo "Erro: ".$e->getMessage();
-    }
-
-    
-    
-    } catch(PDOException $e){
-        echo "Erro: ".$e->getMessage();
-    }
-    
-
-
-
-
-    try {
-  
-      $result = $link->query("SELECT * FROM glosses WHERE sense_bundle_id  = '$sense_bundle_id' AND lang_code = '$lang_code' ORDER BY gloss_order");
-      $gloss_id="";
-      
-  
-      if($result->rowCount()>0){
-        $gloss_order = 1;
-        foreach ($result as $key => $row){    
-      
-          $gloss_id=$row["gloss_id"];
-
-          try {
-            //session_start();
-            $sql = "UPDATE glosses SET gloss_order = :gloss_order WHERE gloss_id=:gloss_id";
-            $stmnt = $link->prepare($sql);
-        
-            $entry_data = [':gloss_order'=>$gloss_order,':gloss_id'=>$gloss_id];
-            $stmnt->execute($entry_data);
-         
-        
-        
-        
-        } catch(PDOException $e){
-            echo "Erro: ".$e->getMessage();
-        }
-
-          $gloss_order++;
-
-        } // foreach
-
-
-      }//if
-    
-      } catch(PDOException $e){
-        echo "Erro: ".$e->getMessage();
-    }
-
-
-
-
-
-
-}//if(isset($_POST['del_gloss']))
-
-if(isset($_POST['restore_gloss'])){
-  $target_lang="";
-    try {
-    //session_start();
-    //session_start();
-    $result = $link->query("SELECT * FROM glosses_bck WHERE gloss_id_bck = '$gloss_id'");
-
-    if($result->rowCount()>0){
-        
-        foreach ($result as $row){
-            $gloss=$row["gloss"];
-            $entry_ref=$row["entry_ref"];
-            $target_lang=$row["target_lang"];
-            
-            $class=$row["class"];
-
-        
-                try{
-                    $sql = "INSERT INTO glosses (sense_bundle_id, entry_ref, gloss_order, target_lang, lang_code, class, gloss) 
-                    VALUES (:sense_bundle_id, :entry_ref, :gloss_order, :target_lang, :lang_code, :class, :gloss)";
-                    $stmnt = $link->prepare($sql);
-                
-                    $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':gloss_order'=>$gloss_order, ':target_lang'=>$target_lang, ':lang_code'=>$lang_code, ':class'=>$class, ':gloss'=>$gloss];
-                    $stmnt->execute($entry_data);
-                
-
-                } catch(PDOException $e){
-                    echo "Erro: ".$e->getMessage();
-                }//try
-
-
-
-        } // foreach      
-
-        }else{
-        //echo "A busca não retornou nenhum resultado.";
-    } // if
-
-
-
-    $sql2 = "DELETE FROM glosses_bck WHERE gloss_id_bck = :gloss_id";
-    $stmnt2 = $link->prepare($sql2);
-
-    $entry_data2 = [':gloss_id'=>$gloss_id];
-    $stmnt2->execute($entry_data2);
-
-
-  
-  } catch(PDOException $e){
-      echo "Erro: ".$e->getMessage();
-  }
-  
-}//if(isset($_POST['del_gloss']))
-
-
-//glosses_edit($sense_bundle_id, $target_lang, $lang_code);
-
-try {
+    include ("connection.php");
   
     $result = $link->query("SELECT * FROM glosses WHERE sense_bundle_id  = '$sense_bundle_id' AND lang_code = '$lang_code' ORDER BY gloss_order");
     $gloss_id="";
@@ -376,7 +121,7 @@ try {
           var bck_gloss = 1;
           console.log(gloss);
           $.ajax({
-          url:'update_gloss.php',
+          url:'edit_gloss.php',
           data:{gloss_id:gloss_id, bck_gloss:bck_gloss},
           type: 'POST',
           /*success: function(data){
@@ -412,7 +157,7 @@ try {
         var update_gloss = 1;
 
         $.ajax({
-            url:'update_gloss.php',
+            url:'edit_gloss.php',
             data:{gloss:gloss, gloss_id:gloss_id, update_gloss:update_gloss},
             type: 'POST',
             success: function(data){
@@ -566,7 +311,7 @@ try {
           var bck_gloss = 1;
           console.log(gloss);
           $.ajax({
-          url:'update_gloss.php',
+          url:'edit_gloss.php',
           data:{gloss_id:gloss_id, bck_gloss:bck_gloss},
           type: 'POST',
           /*success: function(data){
@@ -602,7 +347,7 @@ try {
         var update_gloss = 1;
 
         $.ajax({
-            url:'update_gloss.php',
+            url:'edit_gloss.php',
             data:{gloss:gloss, gloss_id:gloss_id, update_gloss:update_gloss},
             type: 'POST',
             success: function(data){
@@ -626,7 +371,284 @@ try {
   } // try
 
 
+}
 
+if(isset($_POST['lang_code'])){
+
+    $lang_code = $_POST['lang_code'];
+    
+      }else{
+  
+  } 
+  
+  
+
+if(isset($_POST['target_lang'])){
+
+  $target_lang = $_POST['target_lang'];
+  
+    }else{
+
+} 
+
+  if(isset($_POST['bundle'])){
+
+    $sense_bundle_id = $_POST['bundle'];
+    
+      }else{
+  
+  }
+
+  if(isset($_POST['gloss_id'])){
+
+    $gloss_id = $_POST['gloss_id'];
+    
+      }else{
+  
+  }
+
+  if(isset($_POST['gloss_order'])){
+
+    $gloss_order = $_POST['gloss_order'];
+    
+      }else{
+  
+  }
+
+  if(isset($_POST['gloss'])){
+
+    $gloss = $_POST['gloss'];
+    
+      }else{
+  
+  }
+
+  if(isset($_POST['items'])){
+
+    $items = $_POST['items'];
+    
+      }else{
+  
+  }
+
+if(isset($_POST['add_gloss'])){
+
+  try {
+    //session_start();
+    $sql = "INSERT INTO glosses (sense_bundle_id, entry_ref, gloss_order, target_lang, lang_code, class, gloss) 
+    VALUES (:sense_bundle_id, 'entry_ref', :gloss_order, 1, :lang_code, 'class', :gloss)";
+    $stmnt = $link->prepare($sql);
+
+    $entry_data = [':sense_bundle_id'=>$sense_bundle_id,':gloss_order'=>$items+1, ':lang_code'=>$lang_code, ':gloss'=>''];
+    $stmnt->execute($entry_data);
+ 
+
+
+
+
+} catch(PDOException $e){
+    echo "Erro: ".$e->getMessage();
+}
+
+reload_gloss($sense_bundle_id, $lang_code);
+}
+
+
+
+if(isset($_POST['save_gloss'])){
+
+    try {
+      //session_start();
+      $sql = "UPDATE glosses SET gloss = :gloss WHERE gloss_id=:gloss_id";
+      $stmnt = $link->prepare($sql);
+  
+      $entry_data = [':gloss'=>$gloss,':gloss_id'=>$gloss_id];
+      $stmnt->execute($entry_data);
+   
+  
+  
+  
+  } catch(PDOException $e){
+      echo "Erro: ".$e->getMessage();
+  }
+  
+  }
+
+
+
+if(isset($_POST['del_gloss'])){
+
+    try {
+      //session_start();
+      //session_start();
+      $result = $link->query("SELECT * FROM glosses WHERE gloss_id = '$gloss_id'");
+
+      if($result->rowCount()>0){
+        
+        foreach ($result as $row){
+            $gloss=$row["gloss"];
+            $entry_ref=$row["entry_ref"];
+            $target_lang=$row["target_lang"];
+            $gloss_order=$row["gloss_order"];
+            $class=$row["class"];
+
+            if ($gloss==""){
+
+            }else{
+  
+                try{
+                    $sql = "INSERT INTO glosses_bck (sense_bundle_id, entry_ref, gloss_id, gloss_order, target_lang, lang_code, class, gloss) 
+                    VALUES (:sense_bundle_id, :entry_ref, :gloss_id, :gloss_order, :target_lang, :lang_code, :class, :gloss)";
+                    $stmnt = $link->prepare($sql);
+                
+                    $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':gloss_id'=>$gloss_id, ':gloss_order'=>$gloss_order, ':target_lang'=>$target_lang, ':lang_code'=>$lang_code, ':class'=>$class, ':gloss'=>$gloss];
+                    $stmnt->execute($entry_data);
+                
+
+                } catch(PDOException $e){
+                    echo "Erro: ".$e->getMessage();
+                }//try
+  
+            }//if
+
+
+          } // foreach      
+  
+        }else{
+          //echo "A busca não retornou nenhum resultado.";
+      } // if
+
+
+  try{
+      $sql2 = "DELETE FROM glosses WHERE gloss_id = :gloss_id";
+      $stmnt2 = $link->prepare($sql2);
+  
+      $entry_data2 = [':gloss_id'=>$gloss_id];
+      $stmnt2->execute($entry_data2);
+   
+
+  
+    
+    } catch(PDOException $e){
+        echo "Erro: ".$e->getMessage();
+    }
+
+    
+    
+    } catch(PDOException $e){
+        echo "Erro: ".$e->getMessage();
+    }
+    
+
+
+
+
+    try {
+  
+      $result = $link->query("SELECT * FROM glosses WHERE sense_bundle_id  = '$sense_bundle_id' AND lang_code = '$lang_code' ORDER BY gloss_order");
+      $gloss_id="";
+      
+  
+      if($result->rowCount()>0){
+        $gloss_order = 1;
+        foreach ($result as $key => $row){    
+      
+          $gloss_id=$row["gloss_id"];
+
+          try {
+            //session_start();
+            $sql = "UPDATE glosses SET gloss_order = :gloss_order WHERE gloss_id=:gloss_id";
+            $stmnt = $link->prepare($sql);
+        
+            $entry_data = [':gloss_order'=>$gloss_order,':gloss_id'=>$gloss_id];
+            $stmnt->execute($entry_data);
+         
+        
+        
+        
+        } catch(PDOException $e){
+            echo "Erro: ".$e->getMessage();
+        }
+
+          $gloss_order++;
+
+        } // foreach
+
+
+      }//if
+    
+      } catch(PDOException $e){
+        echo "Erro: ".$e->getMessage();
+    }
+
+
+
+    reload_gloss($sense_bundle_id, $lang_code);
+
+
+}//if(isset($_POST['del_gloss']))
+
+if(isset($_POST['restore_gloss'])){
+  $target_lang="";
+    try {
+    //session_start();
+    //session_start();
+    $result = $link->query("SELECT * FROM glosses_bck WHERE gloss_id_bck = '$gloss_id'");
+
+    if($result->rowCount()>0){
+        
+        foreach ($result as $row){
+            $gloss=$row["gloss"];
+            $entry_ref=$row["entry_ref"];
+            $target_lang=$row["target_lang"];
+            
+            $class=$row["class"];
+
+        
+                try{
+                    $sql = "INSERT INTO glosses (sense_bundle_id, entry_ref, gloss_order, target_lang, lang_code, class, gloss) 
+                    VALUES (:sense_bundle_id, :entry_ref, :gloss_order, :target_lang, :lang_code, :class, :gloss)";
+                    $stmnt = $link->prepare($sql);
+                
+                    $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':gloss_order'=>$gloss_order, ':target_lang'=>$target_lang, ':lang_code'=>$lang_code, ':class'=>$class, ':gloss'=>$gloss];
+                    $stmnt->execute($entry_data);
+                
+
+                } catch(PDOException $e){
+                    echo "Erro: ".$e->getMessage();
+                }//try
+
+
+
+        } // foreach      
+
+        }else{
+        //echo "A busca não retornou nenhum resultado.";
+    } // if
+
+
+
+    $sql2 = "DELETE FROM glosses_bck WHERE gloss_id_bck = :gloss_id";
+    $stmnt2 = $link->prepare($sql2);
+
+    $entry_data2 = [':gloss_id'=>$gloss_id];
+    $stmnt2->execute($entry_data2);
+
+
+  
+  } catch(PDOException $e){
+      echo "Erro: ".$e->getMessage();
+  }
+  
+
+
+
+//glosses_edit($sense_bundle_id, $target_lang, $lang_code);
+
+reload_gloss($sense_bundle_id, $lang_code);
+
+
+}
 
   
 if(isset($_POST['bck_gloss'])){
@@ -703,12 +725,3 @@ if(isset($_POST['update_gloss'])){
 }
 
 
-
-
-
-
-    ?>
-    
-
-
-<?php

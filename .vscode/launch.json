@@ -9,7 +9,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost/dic_japiim/index.php",
+            "url": "http://localhost/portal_japiim/dic_japiim/index.php",
             "webRoot": "${workspaceFolder}"
         }
     ]

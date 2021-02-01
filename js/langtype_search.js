@@ -13,12 +13,38 @@ $("#langtype_search").on('change', function (e) {
             $("#reverse").removeClass("active");
 
 
+
+
         }else if(langtype==2){
             $("#primary").removeClass("active");
             $("#reverse").toggleClass("active");
 
 
         }//if
+
+
+
+
+        
+
+        var update_config_session = 1;
+
+        $.ajax({
+            url:'config_session.php',
+            data:{langtype:langtype, update_config_session:update_config_session},
+            type: 'POST',
+            success: function(data){
+                //if(!data.error){
+                    //$('#entry_display').html(data);
+
+                //}
+            }
+            
+
+
+
+        })
+   
         console.log(searchtype);
         console.log(langtype);
         
@@ -34,9 +60,26 @@ $("#langtype_search").on('change', function (e) {
            
        //call_langtype_choice(langtype, btn1, btn2);
    
-       var btn_id = 1;
-       var btn_active = "#panel_btn"+btn_id;
-        var reload = 1;   
+       
+
+        var btn_id = 1;
+        
+        if(searchtype == 1){
+
+            
+        if(langtype==1){
+
+            btn_id = 1;
+
+
+        }
+
+
+        }
+
+
+       var btn_active = "#panel_btn_".concat(btn_id);
+       var reload = 1;
        $.ajax({
        url:'panel_search.php',
        data:{btn_id:btn_id, langtype:langtype, searchtype:searchtype, reload:reload},
@@ -48,6 +91,9 @@ $("#langtype_search").on('change', function (e) {
        }
        
     })
+
+
+
         //panel_lang_check(btn1, btn2);
         //call_langtype_choice(langtype, btn1, btn2);
 
@@ -59,7 +105,7 @@ $("#langtype_search").on('change', function (e) {
             success: function(data){
                 if(!data.error){
                     $('#buttons_keys').html(data);
-                    $(btn_active).toggleClass("active");
+                    //$(btn_active).toggleClass("active");
     
                         }
                     }
@@ -68,5 +114,12 @@ $("#langtype_search").on('change', function (e) {
                 
                 
                 })
+
+
+
+    
+
+
+
     
 });

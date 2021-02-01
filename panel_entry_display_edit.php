@@ -6,9 +6,16 @@ include ("functions.php");
 //$dic_name = $_SESSION['dic_name'];
 
 
-if (session_status() == PHP_SESSION_NONE) {
-  session_start();
-}else{
+
+if (version_compare(phpversion(), '5.4.0', '<')) {
+  if(session_id() == '') {
+   session_start();
+  }
+}
+else {
+  if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+  }
 }
 
 if(isset($_POST['mode'])){
@@ -28,6 +35,7 @@ if(isset($_POST['entry_bundle_id'])){
 
   
   $entry_bundle_id = $_POST['entry_bundle_id'];
+  $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] = $entry_bundle_id;
 }  
     ?>
    <div id="entry_bundle_id" display_mode="<?php echo $mode;?>" entry_bundle_id="<?php echo $entry_bundle_id;?>" hidden></div>
@@ -103,7 +111,7 @@ if(isset($_POST['entry_bundle_id'])){
         <div id="del_entry_alert" class="alert alert-warning mr-2 ml-2 flex-grow-1">
           Você tem certeza que quer apagar toda a entrada?
         </div>
-          <div class="col-lg-12" id="new_entry_panel_modal">
+          <div class="col-lg-12" id="del_entry_panel_modal">
             
           
           </div>

@@ -56,6 +56,20 @@ function butons_keys(searchtype, langtype, btn_display){
        //call_langtype_choice(langtype, btn1, btn2);
    
        var btn_id = 1;
+        
+       if(searchtype == 1){
+
+           
+       if(langtype==1){
+
+           btn_id = 1;
+
+
+       }
+
+
+       }
+
        //btn_active = ".panel_btn#"+btn_id;
         var reload=1;
        $.ajax({
@@ -72,6 +86,9 @@ function butons_keys(searchtype, langtype, btn_display){
         //panel_lang_check(btn1, btn2);
         //call_langtype_choice(langtype, btn1, btn2);
 
+   
+   
+   
         //butons_keys(searchtype, langtype, btn_active);
 
     });

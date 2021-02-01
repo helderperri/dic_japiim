@@ -17,5 +17,28 @@ $(".panel_btn").click(function() {
         }
         
     })
+
+
+    var update_config_session = 1;
+
+    $.ajax({
+        url:'config_session.php',
+        data:{btn_id:btn_id, update_config_session:update_config_session},
+        type: 'POST',
+        success: function(data){
+            //if(!data.error){
+                //$('#entry_display').html(data);
+
+            //}
+        }
+        
+
+
+
+    })
+
+
+
+
     });
 

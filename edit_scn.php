@@ -168,64 +168,59 @@ try{
 
 if(isset($_POST['restore_scn'])){
 
-    try {
-    //session_start();
-    //session_start();
-    $result = $link->query("SELECT * FROM scns_bck WHERE scn_id = '$scn_id'");
+  try {
+  //session_start();
+  //session_start();
+  $result = $link->query("SELECT * FROM scns_bck WHERE scn_id = '$scn_id'");
 
-    if($result->rowCount()>0){
-        
-        foreach ($result as $row){
-            $scn=$row["scn"];
-            $entry_ref=$row["entry_ref"];
-            $target_lang=1;
-            
+  if($result->rowCount()>0){
+      
+      foreach ($result as $row){
+          $scn=$row["scn"];
+          $entry_ref=$row["entry_ref"];
+          $target_lang=0;
+          
 
-        
-                try{
-                    $sql = "INSERT INTO scns (sense_bundle_id, entry_ref, scn_order, lang_code, scn) 
-                    VALUES (:sense_bundle_id, :entry_ref, :scn_order, :lang_code, :scn)";
-                    $stmnt = $link->prepare($sql);
-                
-                    $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':scn_order'=>$scn_order, ':lang_code'=>$lang_code, ':scn'=>$scn];
-                    $stmnt->execute($entry_data);
-                
+      
+              try{
+                  $sql = "INSERT INTO scns (sense_bundle_id, entry_ref, scn_order, lang_code, scn) 
+                  VALUES (:sense_bundle_id, :entry_ref, :scn_order, :lang_code, :scn)";
+                  $stmnt = $link->prepare($sql);
+              
+                  $entry_data = [':sense_bundle_id'=>$sense_bundle_id, ':entry_ref'=>$entry_ref, ':scn_order'=>$scn_order, ':lang_code'=>$lang_code, ':scn'=>$scn];
+                  $stmnt->execute($entry_data);
+              
 
-                } catch(PDOException $e){
-                    echo "Erro: ".$e->getMessage();
-                }//try
-
-
-
-        } // foreach      
-
-        }else{
-        //echo "A busca não retornou nenhum resultado.";
-    } // if
+              } catch(PDOException $e){
+                  echo "Erro: ".$e->getMessage();
+              }//try
 
 
 
-    $sql2 = "DELETE FROM scns_bck WHERE scn_id = :scn_id";
-    $stmnt2 = $link->prepare($sql2);
+      } // foreach      
 
-    $entry_data2 = [':scn_id'=>$scn_id];
-    $stmnt2->execute($entry_data2);
+      }else{
+      //echo "A busca não retornou nenhum resultado.";
+  } // if
 
 
-  
-  } catch(PDOException $e){
-      echo "Erro: ".$e->getMessage();
-  }
-  
-  scns_edit ($sense_bundle_id);
+
+  $sql2 = "DELETE FROM scns_bck WHERE scn_id = :scn_id";
+  $stmnt2 = $link->prepare($sql2);
+
+  $entry_data2 = [':scn_id'=>$scn_id];
+  $stmnt2->execute($entry_data2);
+
+
+
+} catch(PDOException $e){
+    echo "Erro: ".$e->getMessage();
+}
+
+scns_edit ($sense_bundle_id);
 
 }//if(isset($_POST['del_scn']))
 
 
 
 
-
-    ?>
-
-
-<?php

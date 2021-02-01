@@ -1,38 +1,73 @@
 <?php
 
-    $dic_name = "";
-    include ("connection.php");
-    require_once ("functions.php");
+$dic_name = "";
+include ("connection.php");
+require_once ("functions.php");
 
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    if(session_id() == '') {
+     session_start();
+    }
+  }
+  else {
     if (session_status() == PHP_SESSION_NONE) {
       session_start();
+    }
+  }
+
+    
+
+if(isset($_POST['items'])){
+
+    $items = $_POST['items'];
+
     }else{
+
+}    
+
+if(isset($_POST['entry_bundle_id'])){
+
+    $entry_bundle_id = $_POST['entry_bundle_id'];
+    $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] = $entry_bundle_id;
     }
     
-
-    if(isset($_POST['items'])){
-
-        $items = $_POST['items'];
-    
-        }else{
-    
-    }    
-
-    if(isset($_POST['entry_bundle_id'])){
-
-        $entry_bundle_id = $_POST['entry_bundle_id'];
-    
-        }else{
-    
-    }    
-        
 
 
 $source_langs_info = $_SESSION['config_sls_'.$dic_name];
 
+
+
+function update_user_config2($user_sub, $field, $display){
+
+
+    if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+    }
+  
+  //$dic_name = $_SESSION['dic_name'];
+  
+  $dic_name = "";
+  
+  include ("connection.php");
+  
+  
+  $data = [
+    'display' => $display,
+    'user_sub' => $user_sub
+  ];
+  $sql = "UPDATE config_search_users SET $field=:display WHERE user_sub=:user_sub";
+  $stmt= $link->prepare($sql);
+  $stmt->execute($data);
+  
+  
+  
+  
+  }
+
+
 if(isset($_POST['new_entry'])){
 
-    $e = "";
+    //$e = "";
     $sl_count = $_POST['sl_count'];
     
     foreach($source_langs_info as $source_lang_info){
@@ -72,6 +107,19 @@ if(isset($_POST['new_entry'])){
             foreach($result2 as $row){
 
                 $entry_bundle_id =$row["entry_bundle_id"];
+
+                $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] =  $entry_bundle_id;
+
+                if(isset($_SESSION['user_sub'])){
+                    $user_sub = $_SESSION['user_sub'];
+                    update_user_config2($user_sub, "entry_bundle_id", $entry_bundle_id);
+
+                }
+              
+
+ 
+
+
 
 
               }
@@ -155,6 +203,7 @@ if(isset($_POST['new_entry'])){
 
     if(strlen($form) == 0){
 
+
     }else{
 
 
@@ -202,85 +251,77 @@ if(isset($_POST['new_entry'])){
 
 
 
-    
+            }//if(strlen($form) == 0) (else)
+
+        }//foreach
 
 
 
 
-    }//if(strlen($form) == 0) (else)
+        if(empty($e)){
 
-}//foreach
+            echo "<div id='new_entry_alert' class='alert alert-success mr-2 ml-2 flex-grow-1'>Entrada inserida com sucesso!</div>";            
 
-
-
-$entry_bundle_id = "";
-
-try {
-    //session_start();
-    $result2 = $link->query("SELECT * FROM entry_bundles ORDER BY entry_bundle_id DESC LIMIT 1");
-
-    if($result2->rowCount()>0){
-
-        foreach($result2 as $row){
-
-            $entry_bundle_id =$row["entry_bundle_id"];
-           
-        if(isset($_SESSION['entry_bundle_id'])){
-            unset($_SESSION['entry_bundle_id']);
-        }
-        $_SESSION['entry_bundle_id'] = $entry_bundle_id;
-
-          }
-        }
-    
-        } catch(PDOException $e){
-            echo "Erro:xxxx ".$e->getMessage();
-        }
-
-    
-    if(isset($_SESSION['new_entry_update'])){
-        unset($_SESSION['new_entry_update']);
-    }
-
-        $_SESSION['new_entry_update'] = 1;
+        }            
 
 
 
 
-if(empty($e)){
-
-    echo "<div id='new_entry_alert' class='alert alert-success mr-2 ml-2 flex-grow-1'>Entrada inserida com sucesso!</div>";            
-
-}            
+}//if
 
 
-
-
-
-    }//if
-
-
-    if(isset($_POST['update_entry'])){
-        //$entry_bundle_id = "";
-
-        //header("Location: ./");
+if(isset($_POST['update_entry'])){
         
+    $entry_bundle_id = "";
+
+    try {
+        //session_start();
+        $result2 = $link->query("SELECT * FROM entry_bundles ORDER BY entry_bundle_id DESC LIMIT 1");
+
+        if($result2->rowCount()>0){
+
+            foreach($result2 as $row){
+
+                $entry_bundle_id =$row["entry_bundle_id"];
+            
+            }
+            
+            }
+        
+            } catch(PDOException $e){
+                echo "Erro:xxxx ".$e->getMessage();
+            }
+
+        //    if(isset($_SESSION["entry_bundle_id"])){
+          //      unset($_SESSION["entry_bundle_id"]);
+            
+            //}
+            $_SESSION['config_search_'.$dic_name][0]['entry_bundle_id'] = $entry_bundle_id;
+            //$_SESSION["entry_bundle_id"] = $entry_bundle_id;
+        
+        if(isset($_SESSION["new_entry_update"])){
+            unset($_SESSION["new_entry_update"]);
+        }
+
+            $_SESSION["new_entry_update"] = 1;
+
+
  
-    }
+}
 
-    
 
-    if(isset($_POST['update_new_entry_nav'])){
 
-                include ("nav_new_entry.php");
+if(isset($_POST['update_new_entry_nav'])){
 
-    }
+            include ("nav_new_entry.php");
 
-    
+}
 
-    if(isset($_POST['reload_js'])){
 
-        include ("new_entry_nav_js.php");
+
+if(isset($_POST['reload_js'])){
+
+    include ("new_entry_nav_js.php");
 
 }
 

@@ -1,9 +1,17 @@
 <?php
 
        
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    if(session_id() == '') {
+     session_start();
+    }
+  }
+  else {
+    if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+    }
+  }
 
  //$dic_name = $_SESSION['dic_name'];
  $dic_name = "";
@@ -303,7 +311,7 @@ if (session_status() == PHP_SESSION_NONE) {
     ?>
         <div class="dropdown-divider"></div>                           
         <div class="dropdown-header"><small>Código da língua</small></div>                           
-        <div class="checkbox dropdown-item">
+        <div class="checkbox dropdown-item" hidden>
         <input id="lang_code_all_display" type="checkbox" ><label for="lang_code_all_display" style="padding-left:.3em;">Todos</label>
         </div>
 

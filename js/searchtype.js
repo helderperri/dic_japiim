@@ -7,8 +7,29 @@ $(".searchtype").click(function() {
     $('.langchoice').attr("searchtype", searchtype); 
     $(".searchtype.active").removeClass("active");
     $(this).toggleClass("active");            
+
+
+
+
     var btn_id = 1;
-    var btn_active = "#panel_btn_"+btn_id;
+        
+    if(searchtype == 1){
+
+        
+    if(langtype==1){
+
+        btn_id = 1;
+
+
+    }
+
+
+    }
+
+    
+    
+    
+    var btn_active = "#panel_btn_".concat(btn_id);
     var reload = 1;
     $.ajax({
     url:'panel_search.php',
@@ -22,6 +43,27 @@ $(".searchtype").click(function() {
     
     })
 
+
+    
+    var update_config_session = 1;
+
+    $.ajax({
+        url:'config_session.php',
+        data:{searchtype:searchtype, update_config_session:update_config_session},
+        type: 'POST',
+        success: function(data){
+            //if(!data.error){
+                //$('#entry_display').html(data);
+
+            //}
+        }
+        
+
+
+
+    })
+
+
     $.ajax({
         url:'buttons_keys.php',
         data:{searchtype:searchtype, langtype:langtype, reload:reload},
@@ -29,7 +71,7 @@ $(".searchtype").click(function() {
         success: function(data){
             if(!data.error){
                 $('#buttons_keys').html(data);
-                $(btn_active).toggleClass("active");
+                //$(btn_active).toggleClass("active");
 
                     }
                 }

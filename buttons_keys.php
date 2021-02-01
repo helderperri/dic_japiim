@@ -2,16 +2,65 @@
     $dic_name = "";
     include ("connection.php");
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+
+if (version_compare(phpversion(), '5.4.0', '<')) {
+    if(session_id() == '') {
+     session_start();
+    }
+  }
+  else {
+    if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+    }
+  }
+
+
+  $searchtype="";
+  $langtype="";
+  $number_of_sls ="";
+  $number_of_tls ="";
+  $image = "";
+  $video = "";
+  $scn = "";
+  //$mode = 2;
+  $mode = "";
+  //$entry_bundle_id = 139;
+  $entry_bundle_id = "";
+  $selected_btn_id = "";
+  
+  
+
+  if(!empty($_SESSION['config_search_'.$dic_name])){
+
+    foreach($_SESSION['config_search_'.$dic_name] as $row){
+    
+    $searchtype=$row["search_type"];
+    $langtype=$row["lang_type"];
+    $number_of_sls =$row["number_of_sls"];
+    $number_of_tls =$row["number_of_tls"];
+    $image = $row["image"];
+    $video = $row["video"];
+    $scn = $row["scn"];
+    //$mode = 2;
+    $mode = $row["mode"];
+    //$entry_bundle_id = 139;
+    $entry_bundle_id = $row["entry_bundle_id"];
+    $selected_btn_id = $row["btn_id"];
+
+    }
+
+    //$btn_id = $_SESSION['config_search_'.$dic_name][0]['btn_id'];
+
 }
+
+
+
+
 if(!empty($_POST['langtype'])){
 
     $langtype = $_POST['langtype'];
 
 
-}else{
-    $langtype=1;
 }
 
 
@@ -31,8 +80,8 @@ if(isset($_POST['btn_display'])){
     }
 
 
-}else{
 }
+
 
 if(!empty($_POST['lang_number'])){
 
@@ -48,16 +97,16 @@ if(!empty($_POST['lang_number'])){
         
     }elseif($langtype==2){
 
-        $_SESSION['config_tls'][$lang_number-1]['search_display']=$btn_display_new;
-        
+
+
+
+        $_SESSION['config_tls_'.$dic_name][$lang_number-1]['search_display']=$btn_display_new;        
 
     }
 
 
 
 
-
-}else{
 
 }
 
@@ -68,18 +117,17 @@ if(!empty($_POST['searchtype'])){
     $searchtype = $_POST['searchtype'];
 
 
-}else{
-    $searchtype=1;
 }
+
 
 if(!empty($_POST['btn_display'])){
 
     $btn_display = $_POST['btn_display'];
 
 
-}else{
-    $btn_display=1;
 }
+
+
 
 function langtype_search($searchtype, $langtype){
     
@@ -120,7 +168,7 @@ if($langtype==1){
 }
 
 
-function button_keys_output ($searchtype, $langtype){
+function button_keys_output ($searchtype, $langtype, $selected_btn_id){
     
     ?>
     <div class="input-group mb-2">
@@ -153,10 +201,16 @@ function button_keys_output ($searchtype, $langtype){
         $btn_type = $mdarray_orded[$i]["btn_type"];
         $flex_fill = $mdarray_orded[$i]["flex_fill"];
         $btn_display = $mdarray_orded[$i]["btn_display"];
+        $selected = "";
+
+        if($btn_id == $selected_btn_id){
+            $selected = "active";
+
+        }
         
         
         ?>
-        <input type="submit" btn_id="<?php echo $btn_id; ?>" id="panel_btn_<?php echo $btn_id; ?>" searchtype="<?php echo $searchtype; ?>" langtype="<?php echo $langtype; ?>"  style="min-width:2.15em; width:auto; min-height:2em; height: auto; float:left; z-index:2;" class="btn btn-primary btn-sm btn-xs panel_btn <?php echo $flex_fill; ?> <?php echo $btn_type; ?>" value='<?php echo $btn_value; ?>' <?php echo $btn_display; ?>>
+        <input type="submit" btn_id="<?php echo $btn_id; ?>" id="panel_btn_<?php echo $btn_id; ?>" searchtype="<?php echo $searchtype; ?>" langtype="<?php echo $langtype; ?>"  style="min-width:2.15em; width:auto; min-height:2em; height: auto; float:left; z-index:2;" class="btn btn-primary btn-sm btn-xs panel_btn <?php echo $flex_fill; ?> <?php echo $btn_type; ?> <?php echo $selected; ?>"  value='<?php echo $btn_value; ?>' <?php echo $btn_display; ?>>
 
 
 
@@ -482,7 +536,7 @@ function check_class($btn_id){
 
 
 
-button_keys_output ($searchtype, $langtype);
+button_keys_output ($searchtype, $langtype, $selected_btn_id);
 
 
     ?>

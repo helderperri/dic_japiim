@@ -50,12 +50,12 @@ $("#scn_display").change(function() {
 
     if ($(this).is(":checked")){
         $(".scn").show();
-        update_session ('no_lang', 0, 'scn', 1)
+        update_session ('no_lang', 0, 'scn', 1);
 
 
     }else{
         $(".scn").hide();
-        update_session ('no_lang', 0, 'scn', 0)
+        update_session ('no_lang', 0, 'scn', 0);
 
     }
 
@@ -69,11 +69,11 @@ $("#image_display").change(function() {
 
     if ($(this).is(":checked")){
         $(".image").show();
-        update_session ('no_lang', 0, 'image', 0)
+        update_session ('no_lang', 0, 'image', 1);
 
     }else{
         $(".image").hide();
-        update_session ('no_lang', 0, 'image', 1)
+        update_session ('no_lang', 0, 'image', 0);
 
     }
 
@@ -87,11 +87,11 @@ $("#video_display").change(function() {
 
     if ($(this).is(":checked")){
         $(".video").show();
-        update_session ('no_lang', 0, 'video', 0)
+        update_session ('no_lang', 0, 'video', 1);
 
     }else{
         $(".video").hide();
-        update_session ('no_lang', 0, 'video', 1)
+        update_session ('no_lang', 0, 'video', 0);
 
     }
 
@@ -105,15 +105,62 @@ $("#lang_code_all_display").change(function() {
 
     if ($(this).is(":checked")){
         $(".lang_code").show();
-        update_session ('all', 0, 'lang_code_display', 0)
         $(".sl_code_display").prop('checked', true);
         $(".tl_code_display").prop('checked', true);
+        
+       <?php
+       
+       foreach ($_SESSION['config_sls_'.$dic_name] as $row){
+        $source_lang = $row["source_lang"];
+       ?>
+        update_session ('source', <?php echo $source_lang; ?>, 'lang_code_display', 0);
+        console.log("source_lang");
+        <?php
+       }
+       ?>
+
+        <?php
+       
+       foreach ($_SESSION['config_tls_'.$dic_name] as $row){
+        $target_lang = $row["target_lang"];
+       ?>
+        update_session ('target', <?php echo $target_lang; ?>, 'lang_code_display', 0);
+        console.log("target_lang");
+        <?php
+       }
+       ?>
+
 
     }else{
         $(".lang_code").hide();
-        update_session ('all', 0, 'lang_code_display', 1)
         $(".sl_code_display").prop('checked', false);
         $(".tl_code_display").prop('checked', false);
+
+
+        <?php
+       
+       foreach ($_SESSION['config_sls_'.$dic_name] as $row){
+        $source_lang = $row["source_lang"];
+       ?>
+        update_session ('source', <?php echo $source_lang; ?>, 'lang_code_display', 1);
+        console.log("source_lang");
+        <?php
+       }
+       ?>
+
+        <?php
+       
+       foreach ($_SESSION['config_tls_'.$dic_name] as $row){
+        $target_lang = $row["target_lang"];
+       ?>
+        update_session ('target', <?php echo $target_lang; ?>, 'lang_code_display', 1);
+        console.log("target_lang");
+        <?php
+       }
+       ?>
+
+
+
    }
 
 
@@ -160,6 +207,7 @@ if($("#vernacular_sl<?php echo $source_lang;?>_display").is(":checked") && $("#p
 function hide_form_bundle_sl<?php echo $source_lang;?>(){
 if(!$("#vernacular_sl<?php echo $source_lang;?>_display").is(":checked") && !$("#phonemic_sl<?php echo $source_lang;?>_display").is(":checked") && !$("#pron_sl<?php echo $source_lang;?>_display").is(":checked")){
     $(".form_bundle.sl<?php echo $source_lang;?>").hide();
+
 
 }else{
 
